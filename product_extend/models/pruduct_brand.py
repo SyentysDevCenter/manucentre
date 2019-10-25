@@ -16,6 +16,10 @@ class ProductTags(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-
     product_brand_id = fields.Many2one('product.brand', string="Marque")
+
+
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
+
     product_tags_ids = fields.Many2many('product.tags', string="Tags")

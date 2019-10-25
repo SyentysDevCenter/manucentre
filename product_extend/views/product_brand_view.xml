@@ -8,6 +8,15 @@
             <field name="arch" type="xml">
                 <field name="barcode" position="after">
                     <field name="product_brand_id"/>
+                </field>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="product_normal_form_view_inherited">
+            <field name="name">product.form.inherit</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <field name="default_code" position="after">
                     <field name="product_tags_ids" widget="many2many_tags" />
                 </field>
             </field>
