@@ -2,8 +2,8 @@ from odoo import api, fields, models
 
 
 class ProductBrand(models.Model):
-
     _name = 'product.brand'
+    _description = "Marque d'article"
 
     name = fields.Char(required=True)
 
@@ -12,6 +12,7 @@ class ProductTags(models.Model):
      _name = 'product.tags'
      _parent_name = "parent_id"
      _parent_store = True
+     _description = 'Product tags'
 
      name = fields.Char(required=True)
      active = fields.Boolean(help='The active field allows you to hide the tag without removing it.', default=True)
