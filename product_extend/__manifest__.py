@@ -3,7 +3,7 @@
 {
     "name": "Product extend",
     "version": "1.1",
-    "depends": ['base', 'product', 'sale', 'purchase'],
+    "depends": ['base', 'product',],
     "author": "ANDEMA",
     'website': 'http://www.andemaconulting.com',
     "category": "",
