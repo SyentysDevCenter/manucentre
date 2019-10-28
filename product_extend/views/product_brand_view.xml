@@ -26,7 +26,7 @@
                     <field name="name">product.tags.tree</field>
                     <field name="model">product.tags</field>
                     <field name="arch" type="xml">
-                        <tree string="Product tags list">
+                        <tree string="Tags">
                             <field name="name"/>
                         </tree>
                     </field>
@@ -49,7 +49,7 @@
           </record>
 
 
-         <menuitem id="tags_menu" name="Product Tags"
+         <menuitem id="tags_menu" name="Tags"
                 parent="sale.product_menu_catalog"
                 action="product_tag_action" sequence="1"/>
 
@@ -58,7 +58,7 @@
                     <field name="name">product.brand.tree</field>
                     <field name="model">product.brand</field>
                     <field name="arch" type="xml">
-                        <tree string="Product brand list">
+                        <tree string="Marque">
                             <field name="name"/>
                         </tree>
                     </field>
@@ -80,7 +80,7 @@
             <field name="view_mode">tree,form</field>
           </record>
 
-            <menuitem id="main_brand_menu" name="Product brand"
+            <menuitem id="main_brand_menu" name="Marque"
                 parent="sale.product_menu_catalog"
                 action="product_brand_list_action" sequence="1"/>
 
