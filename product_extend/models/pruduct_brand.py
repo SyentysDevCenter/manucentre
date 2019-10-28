@@ -20,8 +20,7 @@ class ProductTags(models.Model):
      display_name = fields.Char('Full Name', compute='_compute_display_name')
 
      child_ids = fields.One2many(string='Child Tags', comodel_name='product.tags', inverse_name='parent_id')
-     parent_left = fields.Integer('Left Parent', select=True)
-     parent_right = fields.Integer('Right Parent', select=True)
+
 
      @api.depends('name', 'parent_id.name')
      def _compute_display_name(self):
