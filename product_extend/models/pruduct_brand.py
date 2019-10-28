@@ -2,8 +2,8 @@ from odoo import api, fields, models
 
 
 class ProductBrand(models.Model):
-
     _name = 'product.brand'
+    _description = "Marque d'article"
 
     name = fields.Char(required=True)
 
@@ -13,6 +13,9 @@ class ProductTags(models.Model):
      _parent_name = "parent_id"
      _parent_store = True
 
+     _description = 'Product tags'
+
+
      name = fields.Char(required=True)
      active = fields.Boolean(help='The active field allows you to hide the tag without removing it.', default=True)
      parent_id = fields.Many2one(string='Parent', comodel_name='product.tags', index=True, select=True, ondelete='cascade')
@@ -20,8 +23,7 @@ class ProductTags(models.Model):
      display_name = fields.Char('Full Name', compute='_compute_display_name')
 
      child_ids = fields.One2many(string='Child Tags', comodel_name='product.tags', inverse_name='parent_id')
-     parent_left = fields.Integer('Left Parent', select=True)
-     parent_right = fields.Integer('Right Parent', select=True)
+
 
      @api.depends('name', 'parent_id.name')
      def _compute_display_name(self):
