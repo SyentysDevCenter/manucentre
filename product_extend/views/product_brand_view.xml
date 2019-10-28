@@ -39,8 +39,11 @@
             <field name="model">product.tags</field>
             <field name="arch" type="xml">
                 <form>
-                    <field name="name"/>
-                    <field name="parent_id"/>
+                    <group>
+                        <field name="name"/>
+                        <field name="parent_id"/>
+                    </group>
+
                 </form>
             </field>
         </record>
