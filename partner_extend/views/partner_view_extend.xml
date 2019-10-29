@@ -1,0 +1,44 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="inherit_partner_form">
+            <field name="name">partner.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+
+            <xpath expr="//notebook" position="inside">
+                   <page string="Permis">
+                       <group>
+                        <group string="Pour la Chasse">
+                            <field name="hunting_licence_number"/>
+                            <field name="hunting_licence_date"/>
+                            <field name="hunting_licence_validity"/>
+                            <field name="hunting_oncfs"/>
+                            <field name="hunting_state"/>
+                        </group>
+
+                       <group string="Pour le Tir">
+                            <field name="shooting_licence"/>
+                            <field name="shooting_licence_validity"/>
+                            <field name="shooting_club_number"/>
+                            <field name="shooting_club_name"/>
+                        </group>
+
+                       <group string="Pour la BallTrap">
+                            <field name="balltrap_licence"/>
+                            <field name="balltrap_licence_validity"/>
+                            <field name="balltrap_club_number"/>
+                            <field name="balltrap_club_name"/>
+                        </group>
+                       </group>
+
+                    </page>
+                </xpath>
+
+
+
+
+            </field>
+        </record>
+    </data>
+</odoo>
