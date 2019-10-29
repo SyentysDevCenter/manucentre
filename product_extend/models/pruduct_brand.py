@@ -18,7 +18,7 @@ class ProductTags(models.Model):
 
      name = fields.Char(required=True)
      active = fields.Boolean(help='The active field allows you to hide the tag without removing it.', default=True)
-     parent_id = fields.Many2one(string='Parent', comodel_name='product.tags', index=True, select=True, ondelete='cascade')
+     parent_id = fields.Many2one(string='Parent', comodel_name='product.tags', index=True,  ondelete='cascade')
      parent_path = fields.Char(index=True)
      display_name = fields.Char('Full Name', compute='_compute_display_name')
 
