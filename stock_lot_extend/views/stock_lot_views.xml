@@ -12,6 +12,7 @@
                 <field name="tag_ids" widget="many2many_tags"/>
                 <field name="latest_price" />
                 <field name="suggested_price" />
+                <field name="occasion" />
             </field>
 
         </field>
