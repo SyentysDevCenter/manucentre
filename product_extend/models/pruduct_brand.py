@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from odoo import api, fields, models
 
 
@@ -55,3 +57,8 @@ class ProductProduct(models.Model):
     _inherit = 'product.product'
 
     product_tags_ids = fields.Many2many('product.tags', string="Tags")
+
+class ProductSupplierinfo(models.Model):
+    _inherit = 'product.supplierinfo'
+
+    old_id = fields.Integer()
