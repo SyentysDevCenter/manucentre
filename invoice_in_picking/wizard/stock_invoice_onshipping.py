@@ -41,6 +41,7 @@ class StockInvoiceOnshipping(models.TransientModel):
                                                ('sale', u'Créer Facture Client')),
                                     string='Type de journal',default=_get_journal_type)
     group = fields.Boolean(u"Regroupé par partenaire")
+    refund = fields.Boolean(u"Avoir?")
     invoice_date = fields.Date('Date Facture')
 
     #Onchange journal type si le journal est changé
@@ -111,8 +112,11 @@ class StockInvoiceOnshipping(models.TransientModel):
             journal2type = {'sale':'out_invoice',
                             'purchase':'in_invoice'}
             inv_type = journal2type.get(data.journal_type) or 'out_invoice'
+            if inv_type == 'out_invoice' and data.refund:
+                inv_type = 'in_refund'
+            if inv_type == 'in_invoice' and data.refund:
+                inv_type = 'out_refund'
             self.with_context(date_inv=data.invoice_date, inv_type=inv_type)
-
             active_ids = self.env.context.get('active_ids')
             new_active_ids = []
             for a in self.env['stock.picking'].browse(active_ids):
