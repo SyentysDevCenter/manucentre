@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_stock_invoice_onshipping" model="ir.ui.view">
+            <field name="name">Stock Invoice Onshipping</field>
+            <field name="model">stock.invoice.onshipping</field>
+            <field name="arch" type="xml">
+              <form string="Créer facture">
+                  <h1>
+                      <field name="journal_type" readonly="1"/>
+                  </h1>
+                  <group>
+                      <field name="journal_id" domain="[('type','=',journal_type)]"/>
+                      <field name="group"/>
+                      <field name="invoice_date" />
+                  </group>
+                  <footer>
+                      <button name="open_invoice" string="Créer" type="object" class="oe_highlight"/>
+                      <button string="Annuler" class="oe_link" special="cancel"/>
+                  </footer>
+             </form>
+            </field>
+        </record>
+
+        <act_window name="Créer factures brouillons"
+            res_model="stock.invoice.onshipping"
+            binding_model="stock.picking"
+            view_mode="form"
+            target="new"
+            id="action_stock_invoice_onshipping"/>
+
+    </data>
+</odoo>
