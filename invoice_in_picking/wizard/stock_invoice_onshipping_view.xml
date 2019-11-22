@@ -12,6 +12,7 @@
                   <group>
                       <field name="journal_id" domain="[('type','=',journal_type)]"/>
                       <field name="group"/>
+                      <field name="refund"/>
                       <field name="invoice_date" />
                   </group>
                   <footer>
