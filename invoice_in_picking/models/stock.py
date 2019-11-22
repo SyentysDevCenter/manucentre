@@ -15,9 +15,9 @@ class StockPicking(models.Model):
         invoice_obj = self.env['account.move']
         partner_id = self.env['res.partner'].browse(partner)
         payment_term_id = False
-        if type == 'in_invoice':
+        if type in ('in_invoice','in_refund'):
             payment_term_id = partner_id.property_supplier_payment_term_id.id
-        if type == 'out_invoice':
+        if type in ('out_invoice','out_refund'):
             payment_term_id = partner_id.property_payment_term_id.id
         company_id = pick_ids.mapped('company_id')
         move_ids = pick_ids.mapped('move_ids_without_package')
@@ -27,12 +27,12 @@ class StockPicking(models.Model):
             analytic_tag_ids = []
             analytic_account_id = False
             purchase_order_line = False
-            sale_order_line = False
+            sale_order_line = []
             price_unit = 0
             account_id = False
-            if type == 'in_invoice':
+            if type in ('in_invoice','in_refund'):
                 account_id = move.product_id.property_account_expense_id.id
-            if type == 'out_invoice':
+            if type in ('out_invoice','out_refund'):
                 account_id = move.product_id.property_account_income_id.id
             if move.purchase_line_id:
                 tax_ids = move.purchase_line_id.taxes_id.ids
@@ -45,7 +45,7 @@ class StockPicking(models.Model):
                 analytic_tag_ids = move.sale_line_id.analytic_tag_ids.ids
                 analytic_account_id = move.sale_line_id.order_id.analytic_account_id.id
                 price_unit = move.sale_line_id.price_unit
-                sale_order_line = move.sale_line_id
+                sale_order_line = move.sale_line_id and move.sale_line_id.ids
             inv_line_ids.append((0,0,{
                 'name': move.name,
                 'account_id':account_id,
@@ -57,7 +57,7 @@ class StockPicking(models.Model):
                 'purchase_line_id':purchase_order_line,
                 'analytic_tag_ids': [(6, 0, analytic_tag_ids)],
                 'analytic_account_id': analytic_account_id,
-                'sale_line_ids':[(6, None, sale_order_line.ids)],
+                'sale_line_ids':[(6, None, sale_order_line)],
             }))
 
         inv_data = {'type': type,
@@ -74,7 +74,11 @@ class StockPicking(models.Model):
                     'picking_ids': [(6,0,pick_ids.mapped('id'))],
                     'invoice_line_ids': inv_line_ids,
                     }
-        invoices |= invoice_obj.create(inv_data)
+        print(inv_data)
+        new_inv = invoice_obj.create(inv_data)
+        print(invoices)
+        print(new_inv)
+        invoices |= new_inv
         return invoices
 
     @api.model
