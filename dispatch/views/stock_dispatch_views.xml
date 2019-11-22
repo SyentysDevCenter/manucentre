@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_dispatch_form" model="ir.ui.view">
+            <field name="name">stock.dispatch.form</field>
+            <field name="model">stock.dispatch</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Dispatch">
+                    <header>
+                        <button name="validate" string="Create Orders" states="draft" type="object" class="oe_highlight"/>
+                        <button name="cancel" string="Cancel" states="draft" type="object"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="action_view_sales" type="object" icon="fa-exchange">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="sales_count" widget="statinfo" nolabel="1" class="mr4"/>
+                                    </span>
+                                    <span class="o_stat_text">Sale Orders</span>
+                                </div>
+                            </button>
+                        </div>
+                        <h1>
+                            <field name="name" class="oe_inline" nolabel="1"/>
+                        </h1>
+                        <group>
+                            <field name="company_id"/>
+                        </group>
+                        <group>
+                            <field name="origin"/>
+                            <field name="date"/>
+                        </group>
+                        <notebook>
+                            <page string="Products" name="products">
+                                <field name="line_ids">
+                                    <tree editable="bottom" create="0" delete="0">
+                                        <field name="product_id"/>
+                                        <field name="product_default_code"/>
+                                        <field name="supplier_product_code"/>
+                                        <field name="supplier_name"/>
+                                        <field name="product_barcode"/>
+                                        <field name="product_list_price"/>
+                                        <field name="partner_id"/>
+                                        <field name="warehouse_dest_id" invisible="1"/>
+                                        <field name="category_id" invisible="1"/>
+                                        <field name="qty_available"/>
+                                        <field name="qty_dest_available"/>
+                                        <field name="qty_dest_virtual_available"/>
+                                        <field name="qty_dest_sold"/>
+                                        <field name="qty_todo"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Other" name="other">
+                                <group>
+                                    <field name="picking_source_ids" />
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_dispatch_tree" model="ir.ui.view">
+            <field name="name">stock.dispatch.tree</field>
+            <field name="model">stock.dispatch</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" string="Dispatch list">
+                    <field name="name"/>
+                    <field name="origin"/>
+                    <field name="date"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_dispatch_tree" model="ir.actions.act_window">
+            <field name="name">Dispatchs</field>
+            <field name="res_model">stock.dispatch</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <menuitem id="dispatch_tree" name="Dispatchs" parent="stock.menu_stock_warehouse_mgmt" sequence="6" action="action_dispatch_tree" groups="stock.group_stock_manager,stock.group_stock_user"/>
+    </data>
+</odoo>
