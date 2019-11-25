@@ -51,12 +51,12 @@ class StockDispatch(models.Model):
             pickings = self.env['stock.picking']
             lines_by_company = {}
             for line in dispatch.line_ids:
-                partner = line.partner_id
-                if not partner or line.qty_todo == 0:
+                wh_id = line.wh_id
+                if not wh_id or line.qty_todo == 0:
                     continue
-                lines_by_company.setdefault(partner.id, [])
+                lines_by_company.setdefault(wh_id.id, [])
                 if not line.product_id.tracking == 'serial':
-                    lines_by_company[partner.id].append([0, False, {
+                    lines_by_company[wh_id.id].append([0, False, {
                         'name':line.product_id.name,
                         'product_uom':line.product_id.uom_id.id,
                         'product_id': line.product_id.id,
@@ -66,7 +66,7 @@ class StockDispatch(models.Model):
                     }])
                 else:
                     for num in range(int(line.qty_todo)):
-                        lines_by_company[partner.id].append([0, False, {
+                        lines_by_company[wh_id.id].append([0, False, {
                             'name': line.product_id.name,
                             'product_uom': line.product_id.uom_id.id,
                             'product_id': line.product_id.id,
@@ -74,15 +74,17 @@ class StockDispatch(models.Model):
                             'location_id': dispatch.wh_id.lot_stock_id.id,
                             'location_dest_id': dispatch.wh_id.supplier_location_id.id,
                         }])
-            for partner_id, lines in lines_by_company.items():
+            for wh_id, lines in lines_by_company.items():
+                wh_id = self.env['stock.warehouse'].browse(wh_id)
                 pick_id = self.env['stock.picking'].create({
-                    'partner_id': partner_id,
+                    'partner_id': wh_id.company_id.partner_id.id,
                     'picking_type_id':dispatch.wh_id.int_type_id.id,
                     'location_id': dispatch.wh_id.lot_stock_id.id,
                     'location_dest_id': dispatch.wh_id.supplier_location_id.id,
                     'move_ids_without_package': lines,
                     'company_id': dispatch.company_id.id,
-                    'dispatch_id': dispatch.id
+                    'dispatch_id': dispatch.id,
+                    'po_wh_id':wh_id.id,
                 })
                 pickings |= pick_id
             dispatch.state = 'done'

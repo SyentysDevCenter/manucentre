@@ -9,7 +9,7 @@
     'author': 'SYENTYS',
     'website': 'http://www.syentys.com',
     'category': 'Inventory',
-    'depends': ['sale_management', 'purchase', 'stock', 'inter_company_rules'],
+    'depends': ['base','sale_management', 'purchase', 'stock', 'inter_company_rules'],
     'data': [
         'wizard/stock_dispatch_wizard.xml',
         'data/sequence.xml',
