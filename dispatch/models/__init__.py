@@ -1,3 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from . import stock_dispatch, stock_picking, sale_order, purchase_order, product_category
+from . import stock_dispatch
+from . import stock_picking
+from . import stock_warehouse

@@ -8,18 +8,18 @@
             <field name="arch" type="xml">
                 <form string="Dispatch">
                     <header>
-                        <button name="validate" string="Create Orders" states="draft" type="object" class="oe_highlight"/>
+                        <button name="validate" string="Creer les transfers" states="draft" type="object" class="oe_highlight"/>
                         <button name="cancel" string="Cancel" states="draft" type="object"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
-                            <button class="oe_stat_button" name="action_view_sales" type="object" icon="fa-exchange">
+                            <button class="oe_stat_button" name="action_view_picking" type="object" icon="fa-exchange">
                                 <div class="o_field_widget o_stat_info">
                                     <span class="o_stat_value">
-                                        <field name="sales_count" widget="statinfo" nolabel="1" class="mr4"/>
+                                        <field name="picking_count" widget="statinfo" nolabel="1" class="mr4"/>
                                     </span>
-                                    <span class="o_stat_text">Sale Orders</span>
+                                    <span class="o_stat_text">Picking</span>
                                 </div>
                             </button>
                         </div>
@@ -44,8 +44,7 @@
                                         <field name="product_barcode"/>
                                         <field name="product_list_price"/>
                                         <field name="partner_id"/>
-                                        <field name="warehouse_dest_id" invisible="1"/>
-                                        <field name="category_id" invisible="1"/>
+                                        <field name="wh_id"/>
                                         <field name="qty_available"/>
                                         <field name="qty_dest_available"/>
                                         <field name="qty_dest_virtual_available"/>

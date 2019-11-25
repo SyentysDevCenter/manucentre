@@ -10,15 +10,27 @@
                     <button name="%(stock_dispatch_wizard_action)d"
                             type="action"
                             class="oe_stat_button"
-                            attrs="{'invisible': ['|', ('state', '!=', 'done'), ('picking_type_code', '=', 'outgoing')]}"
+                            attrs="{'invisible': ['|', ('state', '!=', 'done'), ('type_code', '!=', 'incoming')]}"
                             string="Dispatch"
                             icon="fa-code-fork"/>
                 </xpath>
                 <xpath expr="//page[@name='extra']//field[@name='move_type']" position="after">
-                    <field name="dispatch_id" attrs="{'invisible': [('picking_type_code', '=', 'outgoing')]}" readonly="1"/>
+                    <field name="type_code" invisible="1"/>
+                    <field name="source_dispatch_id" attrs="{'invisible': ['|', ('state', '!=', 'done'), ('type_code', '!=', 'incoming')]}" readonly="1"/>
                 </xpath>
             </field>
         </record>
+
+
+        <record id="action_create_so" model="ir.actions.server">
+            <field name="name">Générer commande</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="state">code</field>
+            <field name="code">action = records.action_create_so()</field>
+        </record>
+
     
     </data>
 </odoo>
