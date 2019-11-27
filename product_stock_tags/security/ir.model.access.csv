@@ -1,0 +1,3 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_sproduct_stock_tag_manager","product.stock.tag","model_product_stock_tag","stock.group_stock_manager",1,1,1,1
+"access_product_stock_tag_all","product.stock.tag.all","model_product_stock_tag",,1,0,0,0

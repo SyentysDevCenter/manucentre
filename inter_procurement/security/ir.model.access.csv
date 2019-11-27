@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_stock_inter_procurement_manager","stock.inter.procurement","model_stock_inter_procurement","stock.group_stock_manager",1,1,1,1
+"access_stock_inter_procurement_all","stock.inter.procurement.all","model_stock_inter_procurement",,1,0,0,0
+"access_stock_inter_procurement_line_manager","stock.inter.line","model_stock_inter_line","stock.group_stock_manager",1,1,1,1
+"access_stock_inter_procurement_line_all","stock.inter.line.all","model_stock_inter_line",,1,0,0,0

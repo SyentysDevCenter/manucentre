@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data noupdate="1">
+
+        <record id="sequence_inter_procurement" model="ir.sequence">
+            <field name="name">Inter procurement</field>
+            <field name="code">stock.inter.procurement</field>
+            <field name="prefix">INTER</field>
+            <field eval="5" name="padding"/>
+            <field eval="1" name="number_next"/>
+            <field eval="1" name="number_increment"/>
+        </record>
+
+    </data>
+</odoo>

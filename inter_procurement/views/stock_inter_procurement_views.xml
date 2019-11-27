@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_stock_inter_procurement_form" model="ir.ui.view">
+            <field name="name">stock.inter.procurement.form</field>
+            <field name="model">stock.inter.procurement</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Inter procurement">
+                    <header>
+                        <button name="validate" string="Creer les transfers" states="draft" type="object" class="oe_highlight"/>
+                        <button name="cancel" string="Cancel" states="draft" type="object"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <h1>
+                            <field name="name" class="oe_inline" nolabel="1"/>
+                        </h1>
+                        <group>
+                            <field name="company_id" readonly="1"/>
+                            <field name="warehouse_id" domain="[('company_id', '=', company_id)]"/>
+                            <field name="route_id"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="date_planned"/>
+                        </group>
+                        <notebook>
+                            <page string="Articles" name="products">
+                                <field name="line_ids">
+                                    <tree editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="quantity"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_stock_inter_procurement_tree" model="ir.ui.view">
+            <field name="name">stock.inter.procurement.tree</field>
+            <field name="model">stock.inter.procurement</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" string="Dispatch list">
+                    <field name="name"/>
+                    <field name="company_id"/>
+                    <field name="warehouse_id"/>
+                    <field name="route_id"/>
+                    <field name="date"/>
+                    <field name="date_planned"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_stock_inter_procurement" model="ir.actions.act_window">
+            <field name="name">Réapprovisionnement (inter-sociétés)</field>
+            <field name="res_model">stock.inter.procurement</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <menuitem id="menu_stock_inter_procurement" name="Réapprovisionnement (inter-sociétés)" parent="stock.menu_stock_warehouse_mgmt" sequence="6" action="action_stock_inter_procurement" groups="stock.group_stock_manager,stock.group_stock_user"/>
+    </data>
+</odoo>
