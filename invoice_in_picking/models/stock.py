@@ -74,10 +74,7 @@ class StockPicking(models.Model):
                     'picking_ids': [(6,0,pick_ids.mapped('id'))],
                     'invoice_line_ids': inv_line_ids,
                     }
-        print(inv_data)
         new_inv = invoice_obj.create(inv_data)
-        print(invoices)
-        print(new_inv)
         invoices |= new_inv
         return invoices
 

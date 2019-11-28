@@ -11,7 +11,6 @@
     'data': [
         'wizard/stock_invoice_onshipping_view.xml',
         'views/stock_view.xml',
-        'views/sale_view.xml',
     ],
     'test': [
 

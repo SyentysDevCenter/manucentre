@@ -50,4 +50,6 @@ class StockPicking(models.Model):
             })
             orders |= order_id
         self.so_done = True
+        for pick in self:
+            pass
         orders.action_confirm()
