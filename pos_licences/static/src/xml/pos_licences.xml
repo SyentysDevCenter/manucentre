@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates id="template" xml:space="preserve">
+
+    <t t-extend='ClientDetails'>
+        <t t-jquery='.client-details-box' t-operation='after'>
+            <div class='client-details-box clearfix'>
+               <div class='client-details-left'>
+                   <p>-------------------------Permis de chasse-----------------------------</p>
+                   <div class='client-detail'>
+                    <span class='licences-label'>Numéro</span>
+                    <t t-if='partner.hunting_licence_number'>
+                        <span class='licence client-hunting-licence-number'><t t-esc='partner.hunting_licence_number' /></span>
+                    </t>
+                    </div>
+                   <div class='client-detail'>
+                    <span class='licences-label'>Date délivrance</span>
+                    <t t-if='partner.hunting_licence_date'>
+                        <span class='licence client-hunting-licence-date'><t t-esc='partner.hunting_licence_date' /></span>
+                    </t>
+                   </div>
+                   <div class='client-detail'>
+                    <span class='licences-label'>Validité</span>
+                    <t t-if='partner.hunting_licence_validity'>
+                        <span class='licence client-hunting-licence-validity'><t t-esc='partner.hunting_licence_validity' /></span>
+                    </t>
+                   </div>
+                   <div class='client-detail'>
+                    <span class='licences-label'>Préfecture d'obtention</span>
+                    <t t-if='partner.hunting_state'>
+                        <span class='licence client-hunting-state'><t t-esc='partner.hunting_state[1]' /></span>
+                    </t>
+                   </div>
+                   <p>-------------------------Licence de Tir-------------------------------</p>
+                   <div class='client-detail'>
+                    <span class='licences-label'>Numéro</span>
+                    <t t-if='partner.shooting_licence'>
+                        <span class='licence client-shooting-licence'><t t-esc='partner.shooting_licence' /></span>
+                    </t>
+                   </div>
+                   <div class='client-detail'>
+                    <span class='licences-label'>Validité</span>
+                    <t t-if='partner.shooting_licence_validity'>
+                        <span class='licence client-shooting-licence-validity'><t t-esc='partner.shooting_licence_validity' /></span>
+                    </t>
+                   </div>
+                   <div class='client-detail'>
+                    <span class='licences-label'>Numéro du club </span>
+                    <t t-if='partner.shooting_club_number'>
+                        <span class='licence client-shooting-club-number'><t t-esc='partner.shooting_club_number' /></span>
+                    </t>
+                   </div>
+                   <div class='client-detail'>
+                    <span class='licences-label'>Nom du club</span>
+                    <t t-if='partner.shooting_club_name'>
+                        <span class='licence client-shooting-club-name'><t t-esc='partner.shooting_club_name' /></span>
+                    </t>
+                   </div>
+               </div>
+                <p>-------------------------Licence de Balltrap---------------------------</p>
+               <div class='client-licences-right'>
+                <div class='client-detail'>
+                    <span class='licences-label'>Numéro</span>
+                    <t t-if='partner.balltrap_licence'>
+                        <span class='licence client-balltrap-licence'><t t-esc='partner.balltrap_licence' /></span>
+                    </t>
+                </div>
+                <div class='client-detail'>
+                    <span class='licences-label'>Validité</span>
+                    <t t-if='partner.balltrap_licence_validity'>
+                        <span class='licence client-balltrap-licence-validity'><t t-esc='partner.balltrap_licence_validity' /></span>
+                    </t>
+                </div>
+                <div class='client-detail'>
+                    <span class='licences-label'>Numéro du club</span>
+                    <t t-if='partner.balltrap_club_number'>
+                        <span class='licence client-balltrap-club-number'><t t-esc='partner.balltrap_club_number' /></span>
+                    </t>
+                </div>
+                <div class='client-detail'>
+                    <span class='licences-label'>Nom du club</span>
+                    <t t-if='partner.balltrap_club_name'>
+                        <span class='licence client-balltrap-club-name'><t t-esc='partner.balltrap_club_name' /></span>
+                    </t>
+                </div>
+               </div>
+            </div>
+        </t>
+    </t>
+
+    <t t-extend='ClientDetailsEdit'>
+        <t t-jquery='.client-details-left' t-operation='append'>
+            <p>-------------------------Permis de chasse-----------------------------</p>
+            <div class='client-detail'>
+                <span class='edit-label'>Numéro</span>
+                <input class='detail client-hunting-licence-number' name='hunting_licence_number'  t-att-value='partner.hunting_licence_number || ""'></input>
+            </div>
+            <div class='client-detail'>
+                <span class='edit-label'>Date délivrance</span>
+                <input class='detail client-hunting-licence-date' name='hunting_licence_date'  t-att-value='partner.hunting_licence_date || ""'></input>
+            </div>
+            <div class='client-detail'>
+                <span class='edit-label'>Validité</span>
+                <input class='detail client-hunting-licence-validity' name='hunting_licence_validity'  t-att-value='partner.hunting_licence_validity || ""'></input>
+            </div>
+            <div class='client-detail'>
+                <span class='edit-label'>Préfecture d'obtention</span>
+                <select class='detail client-hunting-state needsclick' name='hunting_state'>
+                    <option value=''>None</option>
+                    <t t-foreach='widget.pos.countries' t-as='state'>
+                        <option t-att-value='state.id' t-att-selected="partner.hunting_state ? ((state.id === partner.hunting_state[0]) ? true : undefined) : undefined">
+							<t t-esc='state.name'/>
+                        </option>
+                    </t>
+                </select>
+                <!--input class='detail client-hunting-state' name='hunting_state'  t-att-value='partner.hunting_state[1] || ""'></input-->
+            </div>
+            <p>-------------------------Licence de Tir-------------------------------</p>
+            <div class='client-detail'>
+                <span class='edit-label'>Numéro</span>
+                <input class='detail client-shooting-licence' name='shooting_licence'  t-att-value='partner.shooting_licence || ""'></input>
+            </div>
+            <div class='client-detail'>
+                <span class='edit-label'>Validité</span>
+                <input class='detail client-shooting-licence-validity' name='shooting_licence_validity'  t-att-value='partner.shooting_licence_validity || ""'></input>
+            </div>
+            <div class='client-detail'>
+                <span class='edit-label'>Numéro du club</span>
+                <input class='detail client-shooting-club-number' name='shooting_club_number'  t-att-value='partner.shooting_club_number || ""'></input>
+            </div>
+            <div class='client-detail'>
+                <span class='edit-label'>Nom du club</span>
+                <input class='detail client-shooting-club-name' name='shooting_club_name'  t-att-value='partner.shooting_club_name || ""'></input>
+            </div>
+        </t>
+
+
+
+
+        <t t-jquery='.client-details-right' t-operation='append'>
+            <p>-------------------------Licence de Balltrap---------------------------</p>
+            <div class="balltrap">
+            <div class='client-detail'>
+                <span class='edit-label'>Numéro</span>
+                <input class='detail client-balltrap-licence' name='balltrap_licence'  t-att-value='partner.balltrap_licence || ""'></input>
+            </div>
+            <div class='client-detail'>
+                <span class='edit-label'>Validité</span>
+                <input class='detail client-balltrap-licence-validity' name='balltrap_licence_validity'  t-att-value='partner.balltrap_licence_validity || ""'></input>
+            </div>
+            <div class='client-detail'>
+                <span class='edit-label'>Numéro du club</span>
+                <input class='detail client-balltrap-club-number' name='balltrap_club_number'  t-att-value='partner.balltrap_club_number || ""'></input>
+            </div>
+            <div class='client-detail'>
+                <span class='edit-label'>Nom du club</span>
+                <input class='detail client-balltrap-club-name' name='balltrap_club_name'  t-att-value='partner.balltrap_club_name || ""'></input>
+            </div>
+            </div>
+        </t>
+    </t>
+
+
+</templates>

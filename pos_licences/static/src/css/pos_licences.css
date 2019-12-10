@@ -1,0 +1,39 @@
+.pos .clientlist-screen .client-licences {
+    padding: 16px;
+    border-bottom: solid 5px rgb(110,200,155);
+}
+
+
+.pos .clientlist-screen .client-detail > .licences-label {
+    font-weight: bold;
+    display: -webkit-inline-box;
+    width: 120px;
+    text-align: -webkit-right;
+    margin-right: 8px;
+    font-size: 15px;
+}
+
+
+.pos .clientlist-screen .client-detail > .edit-label {
+    font-weight: bold;
+    display: -webkit-inline-box;
+    width: 120px;
+    text-align: -webkit-right;
+    margin-right: 8px;
+    font-size: 15px;
+}
+
+.pos .clientlist-screen .client-detail > .label {
+    font-weight: bold;
+    display: -webkit-inline-box;
+    width: 120px;
+    text-align: -webkit-right;
+    margin-right: 8px;
+    font-size: 15px;
+}
+
+.pos .screen p {
+    font-size: 15px;
+    display: inline-flex;
+    font-weight: 500;
+}

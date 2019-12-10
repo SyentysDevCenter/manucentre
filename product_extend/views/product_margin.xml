@@ -1,0 +1,30 @@
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="inherit_margin_product_product_marque_tree">
+            <field name="name">product.product.tree.inherit</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="arch" type="xml">
+                <field name="standard_price" position="after">
+                    <field name="margin"/>
+                    <field name="margin_percent"/>
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="inherit_margin_product_product_marque_form">
+            <field name="name">product.product.form.inherit</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+            <field name="arch" type="xml">
+                <field name="currency_id" position="before">
+                    <field name="margin"/>
+                    <field name="margin_percent"/>
+                </field>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

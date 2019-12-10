@@ -38,7 +38,7 @@ class StockDispatchWizard(models.TransientModel):
         return self.env['stock.picking'].browse(self._context.get('active_ids'))
     
     company_id = fields.Many2one("res.company", default=_get_default_company)
-    wh_id = fields.Many2one('stock.warehouse',string='Source',domain="[('company_id', '=', company_id)]",requred=True)
+    wh_id = fields.Many2one('stock.warehouse',string='Source',domain="[('company_id', '=', company_id)]",required=True)
     wh_ids = fields.Many2many('stock.warehouse', string='Destinations', default=_get_default_destination, domain="[('company_id', '!=', company_id)]")
     picking_source_ids = fields.Many2many('stock.picking', string='Source Pickings', default=_get_default_source)
     origin = fields.Char("Origin/Object", required=True, default=_get_default_origin)

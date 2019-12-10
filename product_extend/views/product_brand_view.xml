@@ -11,6 +11,7 @@
                 </field>
             </field>
         </record>
+
         <record model="ir.ui.view" id="product_normal_form_view_inherited">
             <field name="name">product.form.inherit</field>
             <field name="model">product.product</field>
@@ -18,6 +19,29 @@
             <field name="arch" type="xml">
                 <field name="default_code" position="after">
                     <field name="product_tags_ids" widget="many2many_tags" />
+                    <field name="product_brand_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="inherit_product_product_marque_tree">
+            <field name="name">product.product.tree.inherit</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="arch" type="xml">
+                <field name="lst_price" position="after">
+                    <field name="product_brand_id" optional="show"/>
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="inherit_product_product_marque_form">
+            <field name="name">product.product.form.inherit</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+            <field name="arch" type="xml">
+                <field name="barcode" position="after">
+                    <field name="product_brand_id"/>
                 </field>
             </field>
         </record>
@@ -26,9 +50,7 @@
                     <field name="name">product.tags.tree</field>
                     <field name="model">product.tags</field>
                     <field name="arch" type="xml">
-
                         <tree string="Tags">
-
                             <field name="display_name"/>
                         </tree>
                     </field>
@@ -43,7 +65,6 @@
                         <field name="name"/>
                         <field name="parent_id"/>
                     </group>
-
                 </form>
             </field>
         </record>
@@ -54,10 +75,7 @@
             <field name="view_mode">tree,form</field>
           </record>
 
-
-
          <menuitem id="tags_menu" name="Tags"
-
                 parent="sale.product_menu_catalog"
                 action="product_tag_action" sequence="1"/>
 
@@ -66,9 +84,7 @@
                     <field name="name">product.brand.tree</field>
                     <field name="model">product.brand</field>
                     <field name="arch" type="xml">
-
                         <tree string="Marque">
-
                             <field name="name"/>
                         </tree>
                     </field>
@@ -90,14 +106,9 @@
             <field name="view_mode">tree,form</field>
           </record>
 
-
             <menuitem id="main_brand_menu" name="Marque"
-
                 parent="sale.product_menu_catalog"
                 action="product_brand_list_action" sequence="1"/>
-
-
-
 
     </data>
 </odoo>

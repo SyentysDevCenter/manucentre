@@ -14,6 +14,7 @@
     'data': [
         'data/sequence.xml',
         'views/stock_inter_procurement_views.xml',
+        'views/stock_picking_views.xml',
         'security/ir.model.access.csv'
     ],
     'demo_xml': [],

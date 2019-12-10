@@ -23,8 +23,14 @@ class StockPicking(models.Model):
             raise UserError("Les transferts doivent avoir une référence de dispatch!")
         lines_by_wh = {}
         for pick in self:
+            route_id = False
+            wh_id = self.env['stock.warehouse'].search([('company_id', '=', pick.company_id.id)], limit=1)
+            if wh_id:
+                route_id = wh_id.inter_route_id
+            if not route_id:
+                raise UserError(f"Aucune route de transfet inter-sociétés n'est définie pour l'entrepôt {wh_id.name}")
             if pick.so_done:
-                raise UserError("Le transfert %s est déjà traité!"%pick.name)
+                raise UserError(f"Le transfert {pick.name} est déjà traité!")
             if not pick.po_wh_id:
                 continue
             lines_by_wh.setdefault(pick.po_wh_id.id, [])
@@ -33,7 +39,8 @@ class StockPicking(models.Model):
                     continue
                 lines_by_wh[pick.po_wh_id.id].append([0, False, {
                     'product_id': line.product_id.id,
-                    'product_uom_qty': line.quantity_done
+                    'product_uom_qty': line.quantity_done,
+                    'route_id':route_id.id,
                 }])
         for wh_id, lines in lines_by_wh.items():
             po_picking_type_id = False
@@ -47,9 +54,8 @@ class StockPicking(models.Model):
                 'order_line': lines,
                 'company_id': pick.company_id.id,
                 'po_picking_type_id': po_picking_type_id,
+                'origin': f'{pick.name}:{pick.dispatch_id.name}'
             })
             orders |= order_id
         self.so_done = True
-        for pick in self:
-            pass
         orders.action_confirm()

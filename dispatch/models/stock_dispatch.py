@@ -50,6 +50,9 @@ class StockDispatch(models.Model):
         for dispatch in self:
             pickings = self.env['stock.picking']
             lines_by_company = {}
+            transit_loc = self.env['stock.location'].search([('company_id','=',dispatch.company_id.id),('usage','=','transit')],limit=1)
+            if not transit_loc:
+                raise UserError(_(f"Aucun emplacement de transit n'est défini pour la société {dispatch.company_id.name}!"))
             for line in dispatch.line_ids:
                 wh_id = line.wh_id
                 if not wh_id or line.qty_todo == 0:
@@ -62,7 +65,7 @@ class StockDispatch(models.Model):
                         'product_id': line.product_id.id,
                         'quantity_done': line.qty_todo,
                         'location_id': dispatch.wh_id.lot_stock_id.id,
-                        'location_dest_id': dispatch.wh_id.supplier_location_id.id,
+                        'location_dest_id': transit_loc.id,
                     }])
                 else:
                     for num in range(int(line.qty_todo)):
@@ -72,7 +75,7 @@ class StockDispatch(models.Model):
                             'product_id': line.product_id.id,
                             'quantity_done': 1,
                             'location_id': dispatch.wh_id.lot_stock_id.id,
-                            'location_dest_id': dispatch.wh_id.supplier_location_id.id,
+                            'location_dest_id': transit_loc.id,
                         }])
             for wh_id, lines in lines_by_company.items():
                 wh_id = self.env['stock.warehouse'].browse(wh_id)
@@ -80,11 +83,12 @@ class StockDispatch(models.Model):
                     'partner_id': wh_id.company_id.partner_id.id,
                     'picking_type_id':dispatch.wh_id.int_type_id.id,
                     'location_id': dispatch.wh_id.lot_stock_id.id,
-                    'location_dest_id': dispatch.wh_id.supplier_location_id.id,
+                    'location_dest_id': transit_loc.id,
                     'move_ids_without_package': lines,
                     'company_id': dispatch.company_id.id,
                     'dispatch_id': dispatch.id,
                     'po_wh_id':wh_id.id,
+                    'origin':dispatch.name,
                 })
                 pickings |= pick_id
             dispatch.state = 'done'
@@ -118,22 +122,22 @@ class StockDispatchLine(models.Model):
     _order = 'product_id'
     
     dispatch_id = fields.Many2one('stock.dispatch')
-    wh_id = fields.Many2one('stock.warehouse')
+    wh_id = fields.Many2one('stock.warehouse',readonly=True,string="Entrepôt")
     company_id = fields.Many2one('res.company',related='wh_id.company_id')
-    partner_id = fields.Many2one(related='company_id.partner_id')
-    product_id = fields.Many2one('product.product', required=True, readonly=True)
-    product_default_code = fields.Char(related='product_id.default_code', readonly=True)
-    product_barcode = fields.Char(related='product_id.barcode', readonly=True)
-    product_list_price = fields.Float(related='product_id.list_price', readonly=True)
+    partner_id = fields.Many2one(related='company_id.partner_id',string='Société (Dest)')
+    product_id = fields.Many2one('product.product', required=True, readonly=True, string='Article')
+    product_default_code = fields.Char(related='product_id.default_code', readonly=True,string='Code')
+    product_barcode = fields.Char(related='product_id.barcode', readonly=True, string='Code à barres')
+    product_list_price = fields.Float(related='product_id.list_price', readonly=True,string="Prix de vente")
 
-    supplier_product_code = fields.Char('Supplier Code', compute='_compute_supplier')
-    supplier_name = fields.Char('Supplier', compute='_compute_supplier')
+    supplier_product_code = fields.Char('Code fournisseur', compute='_compute_supplier')
+    supplier_name = fields.Char('Fournisseur', compute='_compute_supplier')
     
-    qty_todo = fields.Float('To Do')
-    qty_available = fields.Float('Available', compute='_compute_qty_available')
-    qty_dest_available = fields.Float('Dest. Available', compute='_compute_qty_dest_available')
-    qty_dest_virtual_available = fields.Float('Dest. Forecast', compute='_compute_qty_dest_available')
-    qty_dest_sold = fields.Float('Dest. Sold', compute='_compute_qty_dest_sold')
+    qty_todo = fields.Float('A faire')
+    qty_available = fields.Float('Disponible', compute='_compute_qty_available')
+    qty_dest_available = fields.Float('Disponible (Dest)', compute='_compute_qty_dest_available')
+    qty_dest_virtual_available = fields.Float('Prévue (Dest)', compute='_compute_qty_dest_available')
+    qty_dest_sold = fields.Float('Vendue (Dest)', compute='_compute_qty_dest_sold')
 
     
     @api.depends('product_id')

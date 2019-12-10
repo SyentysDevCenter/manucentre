@@ -6,13 +6,10 @@
             <field name="model">stock.invoice.onshipping</field>
             <field name="arch" type="xml">
               <form string="Créer facture">
-                  <h1>
-                      <field name="journal_type" readonly="1"/>
-                  </h1>
                   <group>
-                      <field name="journal_id" domain="[('type','=',journal_type)]"/>
+                      <field name="journal_id" options="{'no_create': True}"/>
                       <field name="group"/>
-                      <field name="refund"/>
+                      <field name="dropshipping"/>
                       <field name="invoice_date" />
                   </group>
                   <footer>

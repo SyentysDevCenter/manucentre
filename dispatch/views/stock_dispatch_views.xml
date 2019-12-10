@@ -35,15 +35,15 @@
                         </group>
                         <notebook>
                             <page string="Products" name="products">
-                                <field name="line_ids">
+                                <field name="line_ids" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}">
                                     <tree editable="bottom" create="0" delete="0">
                                         <field name="product_id"/>
-                                        <field name="product_default_code"/>
-                                        <field name="supplier_product_code"/>
+                                        <field name="product_default_code" optional="hide"/>
+                                        <field name="supplier_product_code" optional="hide"/>
                                         <field name="supplier_name"/>
                                         <field name="product_barcode"/>
                                         <field name="product_list_price"/>
-                                        <field name="partner_id"/>
+                                        <field name="partner_id" optional="hide"/>
                                         <field name="wh_id"/>
                                         <field name="qty_available"/>
                                         <field name="qty_dest_available"/>

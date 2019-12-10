@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name": "Product extend",
+    "name": "Main company",
     "version": "1.1",
-
-    "depends": ['base', 'product', 'sale'],
-
+    "depends": ['base'],
     "author": "ANDEMA",
     'website': 'http://www.andemaconulting.com',
     "category": "",
     "description": "",
     "init_xml": [],
     'data': [
-     'views/product_brand_view.xml',
-     'views/product_margin.xml',
+     'views/company_view.xml',
      'security/ir.model.access.csv',
     ],
     'demo_xml': [],

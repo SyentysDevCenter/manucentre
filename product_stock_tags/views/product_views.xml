@@ -23,5 +23,16 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="inherit_product_product_stock_tags_tree">
+            <field name="name">product.product.tree.inherit</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="arch" type="xml">
+                <field name="lst_price" position="after">
+                    <field name="stock_tags" optional="show" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                </field>
+            </field>
+        </record>
+
     </data>
 </odoo>

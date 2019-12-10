@@ -8,57 +8,52 @@ JOURNAL_TYPE_MAP = {
                     ('incoming', 'supplier'): ['purchase'],
                     }
 
-
 class StockInvoiceOnshipping(models.TransientModel):
+    _name = "stock.invoice.onshipping"
+    _description = "Stock Invoice Onshipping"
 
     #Default Journal
     @api.model
     def _get_journal(self):
+        company_id = False
+        allowed_company_ids= self.env.context.get('allowed_company_ids',False)
+        if allowed_company_ids:
+            company_id = allowed_company_ids[0]
         journal_obj = self.env['account.journal']
-        journal_type = self._get_journal_type()
-        journals = journal_obj.search([('type', '=', journal_type)])
-        return journals and journals[0] or False
-
-    #Get Journal Type
-    @api.model
-    def _get_journal_type(self):
         res_ids = self.env.context.get('active_ids')
         pick_obj = self.env['stock.picking']
         pickings = pick_obj.browse(res_ids)
         picking_type_id = pickings.mapped('picking_type_id')
         if picking_type_id.mapped('code')[0] == 'incoming':
-            return 'purchase'
+            journals = journal_obj.search([('type', '=', 'purchase'),('company_id','=',company_id)])
         elif picking_type_id.mapped('code')[0] == 'outgoing':
-            return 'sale'
+            journals = journal_obj.search([('type', '=', 'sale'),('company_id','=',company_id)])
         else:
             raise UserError("Seules les livraisons / réceptions peuvent être facturés!")
+        return journals and journals[0] or False
 
-    _name = "stock.invoice.onshipping"
-    _description = "Stock Invoice Onshipping"
+    @api.model
+    def _journal_domain(self):
+        company_id = False
+        allowed_company_ids = self.env.context.get('allowed_company_ids', False)
+        if allowed_company_ids:
+            company_id = allowed_company_ids[0]
+        res_ids = self.env.context.get('active_ids')
+        pick_obj = self.env['stock.picking']
+        pickings = pick_obj.browse(res_ids)
+        picking_type_id = pickings.mapped('picking_type_id')
+        domain = []
+        if picking_type_id.mapped('code'):
+            if picking_type_id.mapped('code')[0] == 'incoming':
+                domain = [('type', '=', 'purchase'),('company_id','=',company_id)]
+            if picking_type_id.mapped('code')[0] == 'outgoing':
+                domain = [('type', '=', 'sale'),('company_id','=',company_id)]
+        return domain
 
-    journal_id = fields.Many2one('account.journal', 'Journal Destination', required=True,default=_get_journal)
-    journal_type = fields.Selection(selection=(('purchase', u'Créer Facture Fournisseur'),
-                                               ('sale', u'Créer Facture Client')),
-                                    string='Type de journal',default=_get_journal_type)
+    journal_id = fields.Many2one('account.journal', 'Journal Destination', required=True,default=_get_journal,domain=_journal_domain)
     group = fields.Boolean(u"Regroupé par partenaire")
-    refund = fields.Boolean(u"Avoir?")
+    dropshipping = fields.Boolean(u"Dropshipping?")
     invoice_date = fields.Date('Date Facture')
-
-    #Onchange journal type si le journal est changé
-    def onchange_journal_id(self, journal_id):
-        domain = {}
-        value = {}
-        active_id = self.env.context.get('active_id')
-        if active_id:
-            picking = self.env['stock.picking'].browse(active_id)
-            type = picking.picking_type_id.code
-            usage = picking.move_lines[0].location_id.usage if type == 'incoming' else picking.move_lines[0].location_dest_id.usage
-            journal_types = JOURNAL_TYPE_MAP.get((type, usage), ['sale', 'purchase'])
-            domain['journal_id'] = [('type', 'in', journal_types)]
-        if journal_id:
-            journal = self.env['account.journal'].browse(journal_id)
-            value['journal_type'] = journal.type
-        return {'value': value, 'domain': domain}
 
     @api.model
     def view_init(self,fields_list):
@@ -80,13 +75,15 @@ class StockInvoiceOnshipping(models.TransientModel):
             invoices = self.create_invoice()
             #Open Invoices
             journal2type = {'sale':'out_invoice', 'purchase':'in_invoice'}
-            inv_type = journal2type.get(data.journal_type) or 'out_invoice'
-            if inv_type in ("out_invoice", "out_refund"):
+            inv_type = journal2type.get(data.journal_id.type) or 'out_invoice'
+            if inv_type == "out_invoice":
                 action = self.env.ref('account.action_move_out_invoice_type').read()[0]
-                default_type = 'out_invoice'
-            elif inv_type in ("in_invoice", "in_refund"):
+            elif inv_type == "out_refund":
+                action = self.env.ref('	account.action_move_out_refund_type').read()[0]
+            elif inv_type == "in_invoice":
                 action = self.env.ref('account.action_move_in_invoice_type').read()[0]
-                default_type = 'in_invoice'
+            elif inv_type == "in_refund":
+                action = self.env.ref('account.action_move_in_refund_type').read()[0]
             if len(invoices) > 1:
                 action['domain'] = [('id', 'in', invoices.ids)]
             elif len(invoices) == 1:
@@ -100,7 +97,7 @@ class StockInvoiceOnshipping(models.TransientModel):
                 action = {'type': 'ir.actions.act_window_close'}
 
             context = {
-                'default_type': default_type,
+                'default_type': inv_type,
             }
             action['context'] = context
             return action
@@ -111,11 +108,7 @@ class StockInvoiceOnshipping(models.TransientModel):
             picking_pool = self.env['stock.picking']
             journal2type = {'sale':'out_invoice',
                             'purchase':'in_invoice'}
-            inv_type = journal2type.get(data.journal_type) or 'out_invoice'
-            if inv_type == 'out_invoice' and data.refund:
-                inv_type = 'in_refund'
-            if inv_type == 'in_invoice' and data.refund:
-                inv_type = 'out_refund'
+            inv_type = journal2type.get(data.journal_id.type) or 'out_invoice'
             self.with_context(date_inv=data.invoice_date, inv_type=inv_type)
             active_ids = self.env.context.get('active_ids')
             new_active_ids = []
@@ -127,6 +120,7 @@ class StockInvoiceOnshipping(models.TransientModel):
             res = picking_pool.browse(new_active_ids).action_invoice_create(
                   journal_id=data.journal_id.id,
                   group=data.group,
+                  dropshipping=data.dropshipping,
                   type=inv_type,
                   date=data.invoice_date
             )

@@ -13,8 +13,10 @@
                             <field name="company_id" invisible="1"/>
                             <field name="wh_id"/>
                         </group>
-                        <separator string="Destinations"/>
-                        <field name="wh_ids"/>
+                        <group>
+                            <separator string="Destinations"/>
+                            <field name="wh_ids" nolabel="1"/>
+                        </group>
                     </group>
                     <footer>
                         <button name="validate"
