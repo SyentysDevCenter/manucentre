@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="stock_dispatch_wizard_view" model="ir.ui.view">
+            <field name="name">Dispatch creation</field>
+            <field name="model">product.dispatch.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group>
+                            <field name="origin"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="wh_id"/>
+                        </group>
+                        <group>
+                            <separator string="Destinations"/>
+                            <field name="wh_ids" nolabel="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="validate"
+                                type="object"
+                                string="Create"
+                                class="oe_highlight"/>
+                        <button special="cancel"
+                                string="Cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="stock_dispatch_wizard_action" model="ir.actions.act_window">
+            <field name="name">Open wizard</field>
+            <field name="res_model">product.dispatch.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+
+        <record id="act_new_sub_menu_dispatch" model="ir.actions.act_window">
+            <field name="name">Dispatch</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.dispatch.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="product.model_product_product"/>
+        </record>
+
+
+<!--        <act_window name="Dispatch"-->
+<!--            res_model="product.dispatch.wizard"-->
+<!--            binding_model="stock.picking"-->
+<!--            binding_views="list"-->
+<!--            view_mode="form"-->
+<!--            target="new"-->
+<!--            id="stock_dispatch_batch_picking_tree_action"/>-->
+
+
+
+    </data>
+</odoo>

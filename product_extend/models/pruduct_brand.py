@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
+from odoo.osv import expression
 
 
 class ProductBrand(models.Model):
@@ -58,6 +59,31 @@ class ProductProduct(models.Model):
 
     product_tags_ids = fields.Many2many('product.tags', string="Tags")
     product_brand_id = fields.Many2one('product.brand', string="Marque",related='product_tmpl_id.product_brand_id')
+    margin = fields.Float(string='Marge', compute="_get_margin")
+    margin_percent = fields.Float(string='Marge(%)', compute="_get_margin")
+
+    ref_variante = fields.Char(string='Réference variante', compute = "_get_ref", store=True)
+
+    @api.depends('seller_ids', 'seller_ids.product_code')
+    def _get_ref(self):
+           for rec in self:
+               if rec.seller_ids:
+                   ref = rec.seller_ids[0].product_code
+                   rec.ref_variante = ref
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+            res = super(ProductProduct, self).name_search(name='', args=None, operator='ilike', limit=100)
+            ids = self.search(args + [('ref_variante', '=', name)], limit=limit)
+            if ids:
+                return ids.name_get()
+            return res
+
+
+    def _get_margin(self):
+        for rec in self:
+            rec.margin = rec.lst_price - rec.standard_price
+            rec.margin_percent = (rec.margin / (rec.standard_price or 1.0)) * 100
 
 class ProductSupplierinfo(models.Model):
     _inherit = 'product.supplierinfo'

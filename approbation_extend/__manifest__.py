@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name": "Product extend",
+    "name": "Approval extend",
     "version": "1.1",
 
-    "depends": ['base', 'product', 'sale'],
+    "depends": ['base', 'approvals'],
 
     "author": "ANDEMA",
     'website': 'http://www.andemaconulting.com',
@@ -12,11 +12,7 @@
     "description": "",
     "init_xml": [],
     'data': [
-     'wizard/product_dispatch_wizard.xml',
-     'wizard/purchase_order_create.xml',
-     'views/product_brand_view.xml',
-     # 'views/product_margin.xml',
-     'security/ir.model.access.csv',
+        'views/approval_form_inherit.xml',
     ],
     'demo_xml': [],
     'installable': True,

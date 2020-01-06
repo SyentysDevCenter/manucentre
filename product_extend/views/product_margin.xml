@@ -6,21 +6,9 @@
             <field name="model">product.product</field>
             <field name="inherit_id" ref="product.product_product_tree_view"/>
             <field name="arch" type="xml">
-                <field name="standard_price" position="attributes">
-                    <attribute name="groups">product_extend.group_show_product_cost</attribute>
-                </field>
                 <field name="standard_price" position="after">
-                    <field name="cost_method" invisible="1"/>
-                    <button string="MAJ coût" type="action"
-                                name="%(stock_account.action_view_change_standard_price)d"
-                                attrs="{'invisible':[('cost_method', '=', 'fifo')]}"
-                                class="oe_link oe_inline"
-                                groups="product_extend.group_show_product_cost"/>
-                    <field name="margin" groups="product_extend.group_show_product_cost" optional="hide"/>
-                    <field name="margin_percent" groups="product_extend.group_show_product_cost"/>
-                    <field name="purchase_price"/>
-                    <field name="sales_margin" optional="hide"/>
-                    <field name="sales_margin_percent"/>
+                    <field name="margin"/>
+                    <field name="margin_percent"/>
                 </field>
             </field>
         </record>
@@ -30,33 +18,7 @@
             <field name="model">product.product</field>
             <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
             <field name="arch" type="xml">
-                <field name="standard_price" position="attributes">
-                    <attribute name="groups">product_extend.group_show_product_cost</attribute>
-                </field>
-                <field name="currency_id" position="before">
-                    <field name="margin" groups="product_extend.group_show_product_cost"/>
-                    <field name="margin_percent" groups="product_extend.group_show_product_cost"/>
-                    <field name="purchase_price"/>
-                    <field name="sales_margin"/>
-                    <field name="sales_margin_percent"/>
-                </field>
-            </field>
-        </record>
 
-        <record model="ir.ui.view" id="inherit_stock_product_product_form">
-            <field name="name">product.stock.form.inherit</field>
-            <field name="model">product.product</field>
-            <field name="inherit_id" ref="stock_account.product_variant_easy_edit_view_inherit"/>
-            <field name="arch" type="xml">
-                <field name="standard_price" position="attributes">
-                    <attribute name="groups">product_extend.group_show_product_cost</attribute>
-                </field>
-                <label for="standard_price" position="attributes">
-                    <attribute name="groups">product_extend.group_show_product_cost</attribute>
-                </label>
-                <div name="update_cost_price" position="attributes">
-                    <attribute name="groups">product_extend.group_show_product_cost</attribute>
-                </div>
             </field>
         </record>
 
