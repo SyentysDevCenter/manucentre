@@ -8,8 +8,21 @@
             <field name="inherit_id" ref="approvals.approval_category_view_form"/>
             <field name="arch" type="xml">
                  <xpath expr="//page[@name='options']" position="after">
-                     <page string="Approbation" name="approbation">
-                          <field name="approbation" widget="html"/>
+                     <page string="Formulaire" name="formulaire">
+                          <field name="formulaire" widget="html"/>
+                     </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="inherit_approval_form">
+            <field name="name">approval.request.form.inherit</field>
+            <field name="model">approval.request</field>
+            <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//page[@name='description']" position="after">
+                     <page string="Formulaire" name="formulaire" attrs="{'invisible':[('formulaire', '=', False)]}">
+                          <field name="formulaire" widget="html"/>
                      </page>
                 </xpath>
             </field>
