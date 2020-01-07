@@ -1,0 +1,20 @@
+<odoo>
+    <data>
+
+
+        <record model="ir.ui.view" id="approval_category_view_form_inherit_extend">
+            <field name="name">approval.category.form.inherit</field>
+            <field name="model">approval.category</field>
+            <field name="inherit_id" ref="approvals.approval_category_view_form"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//page[@name='options']" position="after">
+                     <page string="Approbation" name="approbation">
+                          <field name="approbation" widget="html"/>
+                     </page>
+                </xpath>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>
