@@ -25,18 +25,27 @@ class ProductProduct(models.Model):
                 if sellers:
                     rec.ref_variante = sellers[0].product_code
 
+    # @api.model
+    # def _name_search(self, name='', args=None, operator='ilike', limit=100, name_get_uid=None):
+    #
+    #     domain = expression.OR(
+    #             [args or [], [('ref_variante','ilike', name)]])
+    #     print('domaaaaaaaaaaaaaaaa', domain)
+    #     return super(ProductProduct, self.sudo())._name_search(name=name, args=domain, operator=operator, limit=limit,
+    #                                                           name_get_uid=name_get_uid)
 
-    @api.model
-    def name_search(self, name='', args=None, operator='ilike', limit=100):
-        # res = super(ProductProduct, self).name_search(name='', args=None, operator='ilike', limit=100)
 
-        args = args or []
-        domain = []
-
-
-        domain = [('ref_variante', operator, name)]
-        domain =  expression.OR([domain, args])
-        return super(ProductProduct, self).name_search(name=name, args=domain, operator=operator, limit=limit)
+    # @api.model
+    # def name_search(self, name='', args=None, operator='ilike', limit=100):
+    #     # res = super(ProductProduct, self).name_search(name='', args=None, operator='ilike', limit=100)
+    #
+    #     args = args or []
+    #     domain = []
+    #
+    #
+    #     domain = [('ref_variante', operator, name)]
+    #     domain =  expression.OR([domain, args])
+    #     return super(ProductProduct, self).name_search(name=name, args=domain, operator=operator, limit=limit)
 
 
 
