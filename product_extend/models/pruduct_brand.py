@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
+from odoo.osv import expression
+
 
 
 class ProductBrand(models.Model):
@@ -53,11 +55,6 @@ class ProductTemplate(models.Model):
     product_brand_id = fields.Many2one('product.brand', string="Marque")
 
 
-class ProductProduct(models.Model):
-    _inherit = 'product.product'
-
-    product_tags_ids = fields.Many2many('product.tags', string="Tags")
-    product_brand_id = fields.Many2one('product.brand', string="Marque",related='product_tmpl_id.product_brand_id')
 
 class ProductSupplierinfo(models.Model):
     _inherit = 'product.supplierinfo'
