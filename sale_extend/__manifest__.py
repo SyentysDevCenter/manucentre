@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name": "Product extend",
+    "name": "Sale extend",
     "version": "1.1",
 
-    "depends": ['base', 'product', 'sale','stock_account'],
+    "depends": ['base', 'product', 'sale','product_extend','sale_margin'],
 
     "author": "ANDEMA",
     'website': 'http://www.andemaconulting.com',
@@ -12,10 +12,7 @@
     "description": "",
     "init_xml": [],
     'data': [
-     'views/product_brand_view.xml',
-     'views/product_margin.xml',
-     'security/product_security.xml',
-     'security/ir.model.access.csv',
+     'views/sale.xml',
     ],
     'demo_xml': [],
     'installable': True,
