@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="sale_performance_list_view" model="ir.ui.view">
+            <field name="name">CA commercial</field>
+            <field name="model">sale.performance</field>
+            <field name="arch" type="xml">
+                <tree string="CA commercial" create="0" edit="0" delete="0">
+                    <field name="date"/>
+                    <field name="product_id"/>
+                    <field name="quantity"/>
+                    <field name="cost"/>
+                    <field name="margin"/>
+                    <field name="margin_percent"/>
+                    <field name="purchase_price"/>
+                    <field name="sales_margin"/>
+                    <field name="sales_margin_percent"/>
+                    <field name="type"/>
+                    <field name="price_unit"/>
+                    <field name="categ_id"/>
+                    <field name="company_id"/>
+                    <field name="user_id"/>
+                    <field name="warehouse_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_sale_performance_pivot" model="ir.ui.view">
+         <field name="name">CA commercial</field>
+         <field name="model">sale.performance</field>
+         <field name="arch" type="xml">
+             <pivot string="CA commercial">
+                 <field name="date" interval="month" type="col"/>
+                 <field name="price" type="measure"/>
+             </pivot>
+         </field>
+    </record>
+
+        <record model="ir.ui.view" id="view_sale_performance_graph">
+            <field name="name">CA commercial</field>
+            <field name="model">sale.performance</field>
+            <field name="arch" type="xml">
+                <graph string="CA commercial">
+                    <field name="date" interval="month"/>
+                    <field name="price" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <record id="sale_performance_action" model="ir.actions.act_window">
+            <field name="name">CA commercial</field>
+            <field name="res_model">sale.performance</field>
+            <field name="view_mode">pivot,graph,tree</field>
+            <field name="view_id" ref="sales_consolidation.view_sale_performance_pivot"/>
+        </record>
+
+        <record id="action_get_sale_performance" model="ir.actions.server">
+            <field name="name">CA commercial</field>
+            <field name="model_id" ref="sales_consolidation.model_sale_performance"/>
+            <field name="state">code</field>
+            <field name="code">action = model.action_get_turn_over()</field>
+        </record>
+
+
+        <menuitem
+            id="action_get_sale_performance_menu"
+            action="action_get_sale_performance"
+            parent="sale.menu_sale_report"/>
+
+
+    </data>
+</odoo>
