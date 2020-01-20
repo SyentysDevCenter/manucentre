@@ -53,10 +53,13 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     product_brand_id = fields.Many2one('product.brand', string="Marque")
+    product_tags_ids = fields.Many2many('product.tags', 'product_tmpl_tags_rel', 'product_tmpl_id', 'tag_id',
+                                        string="Tags")
 
 
 
-class ProductSupplierinfo(models.Model):
-    _inherit = 'product.supplierinfo'
-
-    old_id = fields.Integer()
+#
+# class ProductSupplierinfo(models.Model):
+#     _inherit = 'product.supplierinfo'
+#
+#     old_id = fields.Integer()

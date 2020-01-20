@@ -12,7 +12,8 @@ class ProductProduct(models.Model):
     purchase_price = fields.Float("Prix d'achat")
     sales_margin = fields.Float(string='Marge commerciale', compute="_get_margin")
     sales_margin_percent = fields.Float(string='Marge commerciale(%)', compute="_get_margin")
-    product_tags_ids = fields.Many2many('product.tags', string="Tags")
+    product_tags_ids = fields.Many2many('product.tags', 'product_product_tags_rel', 'product_id', 'tag_id',
+                                        string="Tags")
     product_brand_id = fields.Many2one('product.brand', string="Marque", related='product_tmpl_id.product_brand_id')
 
     ref_variante = fields.Char(string='Réference variante', compute="_get_ref", store=True)
