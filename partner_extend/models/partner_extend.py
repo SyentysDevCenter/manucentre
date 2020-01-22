@@ -22,3 +22,5 @@ class ResPartner(models.Model):
     balltrap_licence_validity = fields.Char(string=u'Validité de la licence de Ball trap')
     balltrap_club_number = fields.Char(string=u"Numéro du Club Balltrap")
     balltrap_club_name = fields.Char(string="Nom du club Balltrap")
+    fax = fields.Char('Fax')
+    siret = fields.Char(string='SIRET', size=20)

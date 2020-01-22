@@ -10,6 +10,9 @@ class ProductBrand(models.Model):
     _description = "Marque d'article"
 
     name = fields.Char(required=True)
+    description = fields.Text()
+    partner_id = fields.Many2one('res.partner')
+
 
 
 class ProductTags(models.Model):

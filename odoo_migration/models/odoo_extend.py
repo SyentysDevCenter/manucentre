@@ -27,3 +27,45 @@ class StockProductLot(models.Model):
     _inherit = 'stock.production.lot'
 
     old_id = fields.Integer(string='Old id', readonly=True)
+
+
+class ProductSupplierinfo(models.Model):
+    _inherit = 'product.supplierinfo'
+
+    old_id = fields.Integer(string='Old id', readonly=True)
+
+
+class ProductBrand(models.Model):
+    _inherit = 'product.brand'
+
+    old_id = fields.Integer(string='Old id', readonly=True)
+
+
+class UomUom(models.Model):
+    _inherit = 'uom.uom'
+
+    old_id = fields.Integer(string='Old id', readonly=True)
+
+
+class ResCompany(models.Model):
+    _inherit = 'res.company'
+
+    old_id = fields.Integer(string='Old id', readonly=True)
+
+
+class ResCountryState(models.Model):
+    _inherit = 'res.country.state'
+
+    old_id = fields.Integer(string='Old id', readonly=False)
+
+
+class ProductTags(models.Model):
+    _inherit = 'product.tags'
+
+    old_id = fields.Integer(string='Old id', readonly=False)
+
+
+class ProductAttribute(models.Model):
+    _inherit = 'product.attribute'
+
+    old_id = fields.Integer(string='Old id', readonly=False)
