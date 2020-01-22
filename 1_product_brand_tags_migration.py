@@ -8,7 +8,7 @@ HOST = "127.0.0.1"
 Port_source = "5433"
 Port_dest = "5432"
 DB_souce = 'manucentre_last9'
-DB_dest = 'manucentre13'
+DB_dest = 'manucentre1'
 
 def get_product_brand():
     try:
@@ -179,12 +179,12 @@ def create_product_tags(tags, parent={}):
         if not parent:
             for p in tags:
                 cursor.execute("INSERT INTO product_tags (old_id,name,parent_id, active) VALUES(%s, %s,%s, %s)",
-                               (p[0],p[1],p[2],p[3]))
+                               (p[0],p[1],p[2] or None,p[3]))
             connection.commit()
         if parent:
             for p in parent:
                 cursor.execute("update product_tags set parent_id = %s where old_id = %s ",
-                               (parent[p], p))
+                               (p[0], p[1]))
             connection.commit()
     except (Exception, psycopg2.Error) as error :
         print ("Error while connecting to PostgreSQL", error)
@@ -201,7 +201,7 @@ odoo.login('manucentre_last9', 'admin', 'a')
 
 # Login to destination server
 odoov13 = odoorpc.ODOO('localhost', port=8069)
-odoov13.login('manucentre13', 'admin', 'a')
+odoov13.login('manucentre1', 'admin', 'a')
 
 
 partner = odoov13.env['res.partner']
@@ -210,14 +210,15 @@ partner_data = partner.read(partner_ids, ['old_id'])
 dict_partner= {part['old_id']:part['id'] for part in partner_data}
 
 
-# brands = get_product_brand()
-# list_brands = []
-# for p in brands:
-#     data = (
-#         p[0],p[1], dict_partner.get(p[2],None), p[3]
-#     )
-#     list_brands.append(data)
-# create_product_brands(list_brands)
+brands = get_product_brand()
+list_brands = []
+for p in brands:
+    data = (
+        p[0],p[1], dict_partner.get(p[2],None), p[3]
+    )
+    list_brands.append(data)
+create_product_brands(list_brands)
+print("Marque done")
 
 attributes = get_product_attributes()
 list_attributes = []
@@ -227,7 +228,7 @@ for p in attributes:
     )
     list_attributes.append(data)
 create_product_attribute(list_attributes)
-
+print('Attribut done')
 attribute_obj = odoov13.env['product.attribute']
 attributes_ids = attribute_obj.search([])
 att_data = attribute_obj.read(attributes_ids, ['old_id'])
@@ -242,26 +243,31 @@ for p in values:
         )
     list_values.append(data)
 create_product_attribute_value(list_values)
-
-
+print("Valeur d'Attribut done")
+#
 tags = get_product_tags()
 list_tags = []
-parents = {}
 for p in tags:
-    if p[2] != None:
-        parents[p[0]] = p[2]
+
     data = (
         p[0],p[1],False, p[3]
     )
     list_tags.append(data)
 create_product_tags(list_tags, {})
+print("Tag done")
 
-tag = odoov13.env['product.tags']
-tag_ids = tag.search([])
-tag_data = tag.read(tag_ids, ['old_id'])
+parents =[]
+tag13 = odoov13.env['product.tags']
+tags = get_product_tags()
+
+tag13_ids = tag13.search([])
+tag_data = tag13.read(tag13_ids, ['old_id'])
 dict_tag= {part['old_id']:part['id'] for part in tag_data}
-for p in parents:
-    parents[p] = dict_tag.get([parents[p]], False)
+for p in tags:
+    if p[2] != None:
+        data = (dict_tag.get(p[2], False), p[0])
+        parents.append(data)
 
-create_product_tags(list_tags, parents)
+create_product_tags([], parents)
+print("Tag parents done")
 

@@ -69,3 +69,9 @@ class ProductAttribute(models.Model):
     _inherit = 'product.attribute'
 
     old_id = fields.Integer(string='Old id', readonly=False)
+
+
+class ProductAttributeValue(models.Model):
+    _inherit = 'product.attribute.value'
+
+    old_id = fields.Integer(string='Old id', readonly=False)
