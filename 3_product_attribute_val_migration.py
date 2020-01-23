@@ -192,6 +192,39 @@ def get_attribute_line_new():
                 cursor.close()
                 connection.close()
 
+def get_m2m_line_val_comb():
+
+
+    #  #  #  # v.att_id, v.prod_id, p.product_tmpl_id, t.attribute_id, l.id(products):
+    try:
+        connection = psycopg2.connect(user = USER,
+                                      password = PASSWORD,
+                                      host = HOST,
+                                      port = Port_dest,
+                                      database = DB_dest)
+
+        cursor = connection.cursor()
+
+        #  #  #  # line_id  val_id  tmpl_old at_old val_old line_old
+        query ="""Select r.product_template_attribute_line_id, r.product_attribute_value_id, 
+                    te.old_id as tmpl, at.old_id, v.old_id, t.old_id
+                        from product_attribute_value_product_template_attribute_line_rel r 
+                       left join product_template_attribute_line t on r.product_template_attribute_line_id = t.id
+                       left join product_template te on te.id = t.product_tmpl_id
+                       left join product_attribute at on at.id = t.attribute_id
+                       left join product_attribute_value v on v.id = r.product_attribute_value_id 
+                        ;"""
+
+        cursor.execute(query)
+        record = cursor.fetchall()
+        return record
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
+    finally:
+            if(connection):
+                cursor.close()
+                connection.close()
+
 def create_product_attribute_rel(vals):
 
 
@@ -271,6 +304,7 @@ product_vals = get_product_product_vals_m2m()
 product_vals_err_data = []
 old_er_line = []
 for v in product_vals:
+    #     #    #    #  Pour generer les ligne d'attribut manquante pour des variante sans ligne d'origine
     if v[4] == None and (v[2], v[3]) not in old_er_line:
         product_vals_err_data.append((99999999, dict_product_tmpl.get(v[2], None),dict_product_attribute.get(v[3], None)))
         old_er_line.append((v[2], v[3]))
@@ -281,32 +315,51 @@ attribute_line_obj = odoov13.env['product.template.attribute.line']
 product_attribute_line_ids = attribute_line_obj.search([])
 product_attribute_line_data = attribute_line_obj.read(product_attribute_line_ids, ['attribute_id', 'product_tmpl_id'])
 dict_product_attribute_line = {str(part['product_tmpl_id'][0])+'_'+str(part['attribute_id'][0]):part['id'] for part in product_attribute_line_data}
-err_val_data = []
-old_val = []
-for v in product_vals:
-    if v[4] == None and (v[2], v[3]) not in old_val:
-        line = dict_product_attribute_line.get(str(dict_product_tmpl.get(v[2], None))+'_'+str(dict_product_attribute.get(v[3], None)), None)
 
-        err_val_data.append((line, dict_product_attribute_val.get(v[0], None)))
-        old_val.append((v[2], v[3]))
+m2m_lin_val = get_m2m_line_val_comb()
+m2m_lin_list = []
+old_val = []
+# old_val_val = []
+for l in m2m_lin_val:
+    #     #    #    #(old_line,old_val)
+    #  #  #  # line_id  val_id  tmpl_old at_old val_old line_old
+    m2m_lin_list.append((l[5], l[4]))
+    # old_val_val.append((l[2], l[3], l[4] ))
+err_val_data = []
+
+for v in product_vals:
+    #     #    #    #    val, prod, tmpl, attr, line
+    #     #    #    # pour ajouter les valeur d'attribut au ligne correspondant à des variante sans ligne d'origine
+        if v[4] == None and (v[2], v[3]) not in old_val:
+            line = dict_product_attribute_line.get(str(dict_product_tmpl.get(v[2], None))+'_'+str(dict_product_attribute.get(v[3], None)), None)
+
+            err_val_data.append((line, dict_product_attribute_val.get(v[0], None)))
+            old_val.append((v[2], v[3]))
+
+    #     #    #    #  Pour generer des valeur d'attribut au ligne pour des variantes ayant des valeur non lié à la bonne ligne d'attribut
+        if v[4]!= None and (v[4], v[0]) not in m2m_lin_list:
+            line = dict_product_attribute_line.get(
+                str(dict_product_tmpl.get(v[2], None)) + '_' + str(dict_product_attribute.get(v[3], None)), None)
+
+            err_val_data.append((line, dict_product_attribute_val.get(v[0], None)))
+            old_val.append((v[2], v[3]))
+            # old_val_val.append((v[2], v[3], v[0]))
+            m2m_lin_list.append((v[4], v[0]))
 create_product_attribute_line_vals_m2m(err_val_data)
-print('create_product_template_attribute_line er done')
+print('create_product_attribute_line_vals_m2m er done')
 
 
 
 old_lines = []
 prod_val_rel_data = []
 for v in product_vals:
+    #     #    #    #  pour remplir la table product_template_attribute_value
     line = dict_product_attribute_line.get(
         str(dict_product_tmpl.get(v[2], None)) + '_' + str(dict_product_attribute.get(v[3], None)),
         None)
 
     ind = str(str(line)+'_'+str(v[0]))
-    # v.att_id, v.prod_id, p.product_tmpl_id, t.attribute_id, l.id:
-
     if ind not in old_lines:
-
-
         data = (dict_product_attribute_val.get(v[0], None), dict_product_tmpl.get(v[2], None),
                 dict_product_attribute.get(v[3], None), line)
         old_lines.append(ind)
