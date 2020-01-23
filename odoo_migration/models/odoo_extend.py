@@ -5,6 +5,7 @@ class Product(models.Model):
     _inherit = 'product.product'
 
     old_id = fields.Integer(string='Old id', readonly=True)
+    probleme = fields.Char()
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -88,6 +89,7 @@ class ProductTemplateAttributeLine(models.Model):
 #
 # class ProductTemplateAttributeValue(models.Model):
 #     _inherit = 'product.template.attribute.value'
+#
 #
 #     old_index = fields.Char(string='Old index', readonly=False,
 #                             help='construit avec product_product_id avec _ avec product_attribute_value de la v9')
