@@ -334,10 +334,12 @@ for v in product_vals:
     line = dict_product_template_att_value.get(str(att_line)+'_'+str(dict_product_attribute_val.get(v[0], None)),None)
     if line:
         data = (dict_product_prod.get(v[1], None), line)
+        if data in product_vals_rel_data:
+            done_old.append(data)
         if data not in product_vals_rel_data:
             product_vals_rel_data.append(data)
-        else:
-            done_old.append(data)
+
+
 
 print('done repeat', done_old)
 create_product_attribute_rel(product_vals_rel_data)
