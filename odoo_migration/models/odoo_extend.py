@@ -16,6 +16,9 @@ class ProductCateg(models.Model):
 
     old_id = fields.Integer(string='Old id', readonly=True)
 
+    def compute_complete_name(self):
+        self._compute_complete_name()
+
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
@@ -44,7 +47,7 @@ class ProductBrand(models.Model):
 class UomUom(models.Model):
     _inherit = 'uom.uom'
 
-    old_id = fields.Integer(string='Old id', readonly=True)
+    old_id = fields.Integer(string='Old id', readonly=False)
 
 
 class ResCompany(models.Model):
@@ -75,3 +78,18 @@ class ProductAttributeValue(models.Model):
     _inherit = 'product.attribute.value'
 
     old_id = fields.Integer(string='Old id', readonly=False)
+
+class ProductTemplateAttributeLine(models.Model):
+    _inherit = 'product.template.attribute.line'
+
+    old_id = fields.Integer(string='Old id', readonly=False)
+
+
+#
+# class ProductTemplateAttributeValue(models.Model):
+#     _inherit = 'product.template.attribute.value'
+#
+#     old_index = fields.Char(string='Old index', readonly=False,
+#                             help='construit avec product_product_id avec _ avec product_attribute_value de la v9')
+
+
