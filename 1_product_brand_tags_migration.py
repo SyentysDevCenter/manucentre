@@ -8,7 +8,7 @@ HOST = "127.0.0.1"
 Port_source = "5433"
 Port_dest = "5432"
 DB_souce = 'manucentre_last9'
-DB_dest = 'manucentre1'
+DB_dest = 'manucentre2'
 
 def get_product_brand():
     try:
@@ -201,7 +201,7 @@ odoo.login('manucentre_last9', 'admin', 'a')
 
 # Login to destination server
 odoov13 = odoorpc.ODOO('localhost', port=8069)
-odoov13.login('manucentre1', 'admin', 'a')
+odoov13.login('manucentre2', 'admin', 'a')
 
 
 partner = odoov13.env['res.partner']
@@ -229,6 +229,7 @@ for p in attributes:
     list_attributes.append(data)
 create_product_attribute(list_attributes)
 print('Attribut done')
+
 attribute_obj = odoov13.env['product.attribute']
 attributes_ids = attribute_obj.search([])
 att_data = attribute_obj.read(attributes_ids, ['old_id'])

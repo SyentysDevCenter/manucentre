@@ -342,7 +342,7 @@ dict_product_attribute = {part['old_id']:part['id'] for part in product_attribut
 attribute_line = get_product_attribute_line()
 line_list = []
 for l in attribute_line:
-    data = (l[0], dict_product_tmpl.get(l[1],None), dict_product_attribute.get(l[2],None) )
+    data = (l[0], dict_product_tmpl.get(l[1],None), dict_product_attribute.get(l[2],None))
     line_list.append(data)
 create_product_template_attribute_line(line_list)
 print("line d'attribut done")
