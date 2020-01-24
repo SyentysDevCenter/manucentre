@@ -140,15 +140,15 @@ def create_products(products):
                            "%s, %s, %s,"
                            "%s, %s, %s,"
                            " %s, %s, %s, %s, "
-                           " %s, 'no-message',no-message', %s,"
+                           " %s, 'no-message','no-message', %s,"
                            "%s, %s, %s, "
-                           "%s, 'order', %s)",
-                           (p[0],p[1],p[2],
-                            p[3],p[4],p[5],
-                            p[6],p[7],p[8],p[9],
-                            p[10],p[11],
-                            p[12],p[13],p[14],
-                            p[15], p[16]),)
+                           "%s, %s, %s)",
+                           (p[0], p[1], p[2],
+                            p[3], p[4], p[5],
+                            p[6], p[7], p[8], p[9],
+                            p[10], p[11],
+                            p[12], p[13], p[14],
+                            p[15], 'order', p[16]),)
 
         connection.commit()
     except (Exception, psycopg2.Error) as error :
