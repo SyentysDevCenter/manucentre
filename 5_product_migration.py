@@ -135,7 +135,7 @@ def create_products(products):
                            "uom_po_id, active, name, type,"
                            "tracking, purchase_line_warn, sale_line_warn, product_brand_id,"
                            "available_in_pos, to_weight, sale_line_warn_msg,"
-                           "purchase_line_warn_msg, invoice_policy, 'purchase_method') "
+                           "purchase_line_warn_msg, invoice_policy, purchase_method) "
                            "VALUES("
                            "%s, %s, %s,"
                            "%s, %s, %s,"
