@@ -403,10 +403,11 @@ err_val_data = []
 for v in product_vals:
     #     #    #    #    val, prod, tmpl, attr, line
     #     #    #    # pour ajouter les valeur d'attribut au ligne correspondant à des variante sans ligne d'origine
-        if v[4] == None and (v[2], v[3]) not in old_val:
+        if v[4] == None  and (v[2], v[3]) not in old_val or (v[2], v[3], v[0]) not in old_val_val:
             line = dict_product_attribute_line.get(str(dict_product_tmpl.get(v[2], None))+'_'+str(dict_product_attribute.get(v[3], None)), None)
 
             err_val_data.append((line, dict_product_attribute_val.get(v[0], None)))
+            old_val_val.append((v[2], v[3], v[0]))
             old_val.append((v[2], v[3]))
 
     #     #    #    #  Pour generer des valeur d'attribut au ligne pour des variantes ayant des valeur non lié à la bonne ligne d'attribut

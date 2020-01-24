@@ -74,6 +74,11 @@ class ProductAttribute(models.Model):
 
     old_id = fields.Integer(string='Old id', readonly=False)
 
+class Account(models.Model):
+    _inherit = 'account.account'
+
+    old_id = fields.Integer(string='Old id', readonly=False)
+
 
 class ProductAttributeValue(models.Model):
     _inherit = 'product.attribute.value'
@@ -84,14 +89,5 @@ class ProductTemplateAttributeLine(models.Model):
     _inherit = 'product.template.attribute.line'
 
     old_id = fields.Integer(string='Old id', readonly=False)
-
-
-#
-# class ProductTemplateAttributeValue(models.Model):
-#     _inherit = 'product.template.attribute.value'
-#
-#
-#     old_index = fields.Char(string='Old index', readonly=False,
-#                             help='construit avec product_product_id avec _ avec product_attribute_value de la v9')
 
 

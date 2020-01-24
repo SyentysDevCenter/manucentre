@@ -9,7 +9,7 @@ HOST = "127.0.0.1"
 Port_source = "5433"
 Port_dest = "5432"
 DB_souce = 'manucentre_last9'
-DB_dest = 'manucentre1'
+DB_dest = 'manucentre2'
 
 #
 # def get_companies():
@@ -149,8 +149,11 @@ def get_partners(partner_ids):
                 f"p.customer, p.supplier, p.active, p.hunting_licence_number, p.hunting_licence_date, p.hunting_licence_validity," \
                 f"p.hunting_oncfs, p.hunting_state, p.shooting_licence, p.shooting_licence_validity, p.shooting_club_number," \
                 f"p.shooting_club_name, p.balltrap_licence, p.balltrap_licence_validity, p.balltrap_club_number," \
-                f"p.balltrap_club_name, p.siret, p.display_name,parent_id" \
-                f" from res_partner p where p.id in {tuple(partner_ids)}" \
+                f"p.balltrap_club_name, p.siret, p.display_name, parent_id," \
+                f"CAST(SPLIT_PART(ir.value_reference,',',2) as INTEGER),CAST(SPLIT_PART(ir2.value_reference,',',2) as INTEGER)" \
+                f" from res_partner p LEFT OUTER JOIN ir_property ir ON p.ID = CAST(SPLIT_PART(ir.res_id,',',2) as INTEGER)" \
+                f" and ir.name ='property_account_payable_id' LEFT OUTER JOIN ir_property ir2 ON p.ID = CAST(SPLIT_PART(ir2.res_id,',',2) as INTEGER) " \
+                f" and ir2.name ='property_account_receivable_id'  where p.id in {tuple(partner_ids)}" \
                 f"ORDER BY p.id"
         cursor.execute(query)
         record = cursor.fetchall()
@@ -169,7 +172,7 @@ odoo.login("manucentre_last9", 'admin', 'a')
 
 # Login to destination server
 odoov13 = odoorpc.ODOO('localhost', port="8069")
-odoov13.login("manucentre1", 'admin', 'a')
+odoov13.login("manucentre2", 'admin', 'a')
 
 payment_term = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'account_payment_term_30days'], {})
 
@@ -190,9 +193,14 @@ dict_state = {part['old_id']:part['id'] for part in state_data}
 
 partner = odoo.env['res.partner']
 partner13 = odoov13.env['res.partner']
+account_ids = account.search([])
+account_data = account.read(account_ids, ['old_id'])
+dict_account = {acc['old_id']:acc['id'] for acc in account_data}
+
 
 offset = 0
 old_list = []
+accounts_data = []
 for i in range(40):
     partner_ids = partner.search([], offset=offset, limit=2000)
     offset += 2000
@@ -201,22 +209,28 @@ for i in range(40):
     for part in get_partners(partner_ids):
         # partner13_old = partner13.search([('old_id', '=', part[12])])
         if part[12] not in old_list:
-            property_account_payable_id = supplier[0]
-            property_account_receivable_id = customer[0]
+            property_account_payable_id = dict_account.get(part[32], False)
+            property_account_receivable_id = dict_account.get(part[33], False)
+            if not property_account_payable_id:
+                property_account_payable_id = supplier[0]
+            if not property_account_receivable_id:
+                property_account_receivable_id = customer[0]
+            accounts_data.append((part[12], property_account_payable_id, property_account_receivable_id))
             date_delivr = None
             if isinstance(part[17], (datetime, date)):
                 date_delivr = part[17].isoformat()
+            siret =None
+            if part[29] != None:
+                siret = part[29][:14]
 
             data = (part[0], part[1], part[2], part[3], part[4], part[5], part[6], part[7], part[8], part[9], part[10], part[11], part[12],
                     1 if part[13] else 0, 1 if part[14] else 0, part[15],part[16],date_delivr,part[18],part[19],
-                    dict_state.get(part[20], None),part[21],part[22],part[23],part[24],part[25],part[26],part[27],part[28],part[29],part[30])
+                    dict_state.get(part[20], None),part[21],part[22],part[23],part[24],part[25],part[26],part[27],part[28],siret,part[30])
 
             old_list.append(part[12])
 
             list_data.append(data)
-#     # result = odoov13.execute(
-#     #     'res.partner', 'create',
-#     #     list_data)
+
     create_partners(list_data)
     if (i > 0):
         print(f"Number of records is:{i*2000}")
@@ -231,12 +245,15 @@ payment_term_supplier_field = odoov13.execute_kw('ir.model.data', 'get_object_re
 property_account_receivable_field = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'field_res_partner__property_account_receivable_id'], {})
 property_account_payable_field = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'field_res_partner__property_account_payable_id'], {})
 partners = partner13.search([('old_id', '!=', False)])
+
+old_parts = partner13.read(partners, ['old_id'])
+old_list_ids = {part['old_id']:part['id'] for part in old_parts}
 #
-for partner in partners:
-    payment_data = ('property_payment_term_id', 'res.partner,'+str(partner),payment_term_field[1],'account.payment.term,'+str(payment_term[1]),"many2one")
-    payment_supplier_data = ('property_supplier_payment_term_id', 'res.partner,'+str(partner),payment_term_supplier_field[1],'account.payment.term,'+str(payment_term[1]),"many2one")
-    account_receivable_data = ('property_account_receivable_id', 'res.partner,'+str(partner), property_account_receivable_field[1],'account.account,'+str(customer[0]),"many2one")
-    account_payable_data = ('property_account_payable_id','res.partner,'+str(partner),property_account_payable_field[1],'account.account,'+str(supplier[0]),"many2one")
+for d in accounts_data:
+    payment_data = ('property_payment_term_id', 'res.partner,'+str(old_list_ids.get(d[0], False)),payment_term_field[1],'account.payment.term,'+str(payment_term[1]),"many2one")
+    payment_supplier_data = ('property_supplier_payment_term_id', 'res.partner,'+str(old_list_ids.get(d[0], False)),payment_term_supplier_field[1],'account.payment.term,'+str(payment_term[1]),"many2one")
+    account_receivable_data = ('property_account_receivable_id', 'res.partner,'+str(old_list_ids.get(d[0], False)), property_account_receivable_field[1],'account.account,'+str(d[2]),"many2one")
+    account_payable_data = ('property_account_payable_id','res.partner,'+str(old_list_ids.get(d[0], False)),property_account_payable_field[1],'account.account,'+str(d[1]),"many2one")
     data_payment_term_data.append(payment_data)
     data_payment_supplier_term_data.append(payment_supplier_data)
     property_account_receivable_data.append(account_receivable_data)
@@ -248,8 +265,6 @@ create_properties(data_payment_supplier_term_data)
 create_properties(property_account_receivable_data)
 create_properties(property_account_payable_data)
 
-old_parts = partner13.read(partners, ['old_id'])
-old_list_ids = {part['old_id']:part['id'] for part in old_parts}
 # print('old_list_ids',old_list_ids)
 
 parents = []
