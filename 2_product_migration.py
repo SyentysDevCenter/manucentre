@@ -9,7 +9,7 @@ HOST = "127.0.0.1"
 Port_source = "5433"
 Port_dest = "5432"
 DB_souce = 'manucentre_last9'
-DB_dest = 'manucentre1'
+DB_dest = 'manucentre2'
 
 def get_product_product():
     try:
@@ -61,6 +61,57 @@ def get_product_categs():
                 cursor.close()
                 connection.close()
 
+def get_product_tags():
+    try:
+        connection = psycopg2.connect(user = USER_source,
+                                      password = PASSWORD_source,
+                                      host = HOST,
+                                      port = Port_source,
+                                      database = DB_souce)
+
+
+        cursor = connection.cursor()
+        query = """
+                select tag_id, product_id
+                from product_product_tag_rel;
+                """
+        cursor.execute(query)
+        record = cursor.fetchall()
+        return record
+
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
+    finally:
+            if(connection):
+                cursor.close()
+                connection.close()
+
+
+def create_product_tags(tags):
+    try:
+        connection = psycopg2.connect(user = USER,
+                                      password = PASSWORD,
+                                      host = HOST,
+                                      port = Port_dest,
+                                      database = DB_dest)
+
+        cursor = connection.cursor()
+
+        for p in tags:
+            cursor.execute("INSERT INTO product_product_tags_rel "
+                           "(tag_id, product_id) "
+                           "VALUES(%s, %s)",
+                           (p[0], p[1]))
+        connection.commit()
+
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
+    finally:
+            if(connection):
+                cursor.close()
+                connection.close()
+
+
 def create_product_category(categs, parent):
     try:
         connection = psycopg2.connect(user = USER,
@@ -103,7 +154,8 @@ def get_products():
                 select t.id, t.categ_id, t.list_price, 
                         t.sale_ok, t.purchase_ok, t.uom_po_id, 
                         t.active,t.name, t.type, t.tracking,                         
-                        t.product_brand_id, i.value, t.available_in_pos, t.to_weight
+                        t.product_brand_id, i.value, t.available_in_pos, t.to_weight, t.sale_line_warn_msg, 
+                        t.purchase_line_warn_msg
                         from product_template t left join ir_translation i on t.id = i.res_id
                         and i.name='product.template,name' and lang ='fr_FR';
                 """
@@ -133,16 +185,16 @@ def create_products(products):
                            "sale_ok, purchase_ok, uom_id,"
                            "uom_po_id, active, name, type,"
                            "tracking ,purchase_line_warn, sale_line_warn, product_brand_id,available_in_pos,"
-                           "to_weight) "
+                           "to_weight,sale_line_warn_msg,purchase_line_warn_msg) "
                            "VALUES("
                            "%s, %s, %s,"
                            "%s, %s,%s,"
                            "%s, %s,%s, %s,"
-                           "%s, %s,%s,%s,%s,%s)",
+                           "%s, %s,%s,%s,%s,%s,%s,%s)",
                            (p[0],p[1],p[2],
                             p[3],p[4],p[5],
                             p[6],p[7],p[8],p[9],
-                            p[10],'','',p[11],p[12],p[13]),)
+                            p[10],'','',p[11],p[12],p[13],p[14],p[15]),)
 
         connection.commit()
     except (Exception, psycopg2.Error) as error :
@@ -181,12 +233,9 @@ odoo.login('manucentre_last9', 'admin', 'a')
 
 # Login to destination server
 odoov13 = odoorpc.ODOO('localhost', port=8069)
-odoov13.login('manucentre1', 'admin', 'a')
+odoov13.login('manucentre2', 'admin', 'a')
 
-categ = odoov13.env['product.category']
-categ_ids = categ.search([])
-categ_data = categ.read(categ_ids, ['old_id'])
-dict_categ= {part['old_id']:part['id'] for part in categ_data}
+
 
 categ13_all = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['product', 'product_category_all'], {})
 categ_all = odoo.execute_kw('ir.model.data', 'get_object_reference', ['product', 'product_category_all'], {})
@@ -198,14 +247,17 @@ categ.write([categ13_sale[1]],{'old_id': categ_sale[1]})
 categs = get_product_categs()
 list_categs = []
 for p in categs:
-    if not p[0] in dict_categ:
+    if not p[0] in list_categs:
         data = (
             p[0],p[1]
         )
         list_categs.append(data)
 create_product_category(list_categs, [])
 print('category done')
-
+categ = odoov13.env['product.category']
+categ_ids = categ.search([])
+categ_data = categ.read(categ_ids, ['old_id'])
+dict_categ= {part['old_id']:part['id'] for part in categ_data}
 
 parents =[]
 for p in categs:
@@ -238,12 +290,12 @@ for p in products:
     print('naaaaame', p[11], p[0])
     if p[11] != None:
         name= p[11]
-
+    print('categ_dd', dict_categ.get(p[1], None), p[1])
     data = (
         p[0], dict_categ.get(p[1], None), p[2],
         p[3], p[4], dict_uom.get(p[5], None),
         dict_uom.get(p[5], None), p[6], name, p[8], p[9],
-        dict_brand.get(p[10], None),p[12],p[13]
+        dict_brand.get(p[10], None),p[12],p[13],p[14],p[15]
     )
     list_products.append(data)
 create_products(list_products)
@@ -273,4 +325,22 @@ for p in product_products:
         )
         list_p_p.append(data)
 create_product_products(list_p_p)
+
+
+product_prod = odoov13.env['product.product']
+product_prod_ids = product_prod.search(['|', ('active', '=', True),('active', '=', False)])
+product_prod_data = product_prod.read(product_prod_ids, ['old_id'])
+dict_product_prod = {part['old_id']: part['id'] for part in product_prod_data}
+
+product_tags = get_product_tags()
+tags_produ_list = []
+for p in product_tags:
+    if dict_product_prod.get(p[1],False):
+        data = (
+            p[0],
+            dict_product_prod.get(p[1],None),
+
+        )
+        tags_produ_list.append(data)
+create_product_tags(tags_produ_list)
 

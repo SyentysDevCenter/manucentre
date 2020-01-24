@@ -9,7 +9,7 @@ HOST = "127.0.0.1"
 Port_source = "5433"
 Port_dest = "5432"
 DB_souce = 'manucentre_last9'
-DB_dest = 'manucentre1'
+DB_dest = 'manucentre2'
 
 
 def get_product_attribute_line():
@@ -104,6 +104,27 @@ def create_product_attribute_line_vals_m2m(vals):
             cursor.execute("INSERT INTO product_attribute_value_product_template_attribute_line_rel "
                            "(product_template_attribute_line_id, product_attribute_value_id) "
                            "VALUES(%s, %s)",
+                           (p[0], p[1]))
+        connection.commit()
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
+    finally:
+            if(connection):
+                cursor.close()
+                connection.close()
+
+def update_product_probleme(vals):
+    try:
+        connection = psycopg2.connect(user = USER,
+                                      password = PASSWORD,
+                                      host = HOST,
+                                      port = Port_dest,
+                                      database = DB_dest)
+
+        cursor = connection.cursor()
+        for p in vals:
+
+            cursor.execute("""Update product_product set probleme = %s where id = %s""",
                            (p[0], p[1]))
         connection.commit()
     except (Exception, psycopg2.Error) as error :
@@ -225,6 +246,56 @@ def get_m2m_line_val_comb():
                 cursor.close()
                 connection.close()
 
+def get_product_template_att_value():
+    try:
+        connection = psycopg2.connect(user = USER,
+                                      password = PASSWORD,
+                                      host = HOST,
+                                      port = Port_dest,
+                                      database = DB_dest)
+        cursor = connection.cursor()
+        query ="""Select r.id , r.attribute_line_id, r.product_attribute_value_id                 
+                        from product_template_attribute_value r                         
+                        ;"""
+
+        cursor.execute(query)
+        record = cursor.fetchall()
+        return record
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
+    finally:
+            if(connection):
+                cursor.close()
+                connection.close()
+
+def get_product_template_att_lines():
+    # product_attribute_line_data = attribute_line_obj.read(product_attribute_line_ids,
+    #                                                       ['attribute_id', 'product_tmpl_id'])
+    try:
+        connection = psycopg2.connect(user = USER,
+                                      password = PASSWORD,
+                                      host = HOST,
+                                      port = Port_dest,
+                                      database = DB_dest)
+
+        cursor = connection.cursor()
+
+        query ="""Select r.id , r.attribute_id, r.product_tmpl_id
+                 
+                        from product_template_attribute_line r 
+                        
+                        ;"""
+
+        cursor.execute(query)
+        record = cursor.fetchall()
+        return record
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
+    finally:
+            if(connection):
+                cursor.close()
+                connection.close()
+
 def create_product_attribute_rel(vals):
 
 
@@ -256,7 +327,7 @@ odoo.login('manucentre_last9', 'admin', 'a')
 
 # Login to destination server
 odoov13 = odoorpc.ODOO('localhost', port=8069)
-odoov13.login('manucentre1', 'admin', 'a')
+odoov13.login('manucentre2', 'admin', 'a')
 
 product_tmpl = odoov13.env['product.template']
 product_tmpl_ids = product_tmpl.search(['|', ('active', '=', True),('active', '=', False)])
@@ -283,6 +354,7 @@ dict_product_attribute_val = {part['old_id']:part['id'] for part in product_attr
 
 attribute_line_obj = odoov13.env['product.template.attribute.line']
 product_attribute_line_ids = attribute_line_obj.search([])
+
 product_attribute_line_data = attribute_line_obj.read(product_attribute_line_ids, ['old_id'])
 dict_product_attribute_line_1 = {part['old_id']:part['id'] for part in product_attribute_line_data}
 
@@ -312,19 +384,20 @@ create_product_template_attribute_line(product_vals_err_data)
 print('create_product_template_attribute_line err done')
 
 attribute_line_obj = odoov13.env['product.template.attribute.line']
-product_attribute_line_ids = attribute_line_obj.search([])
-product_attribute_line_data = attribute_line_obj.read(product_attribute_line_ids, ['attribute_id', 'product_tmpl_id'])
-dict_product_attribute_line = {str(part['product_tmpl_id'][0])+'_'+str(part['attribute_id'][0]):part['id'] for part in product_attribute_line_data}
+# product_attribute_line_ids = attribute_line_obj.search([])
+product_attribute_line_data = get_product_template_att_lines()
+# product_attribute_line_data = attribute_line_obj.read(product_attribute_line_ids, ['attribute_id', 'product_tmpl_id'])
+dict_product_attribute_line = {str(part[2])+'_'+str(part[1]):part[0] for part in product_attribute_line_data}
 
 m2m_lin_val = get_m2m_line_val_comb()
 m2m_lin_list = []
 old_val = []
-# old_val_val = []
+old_val_val = []
 for l in m2m_lin_val:
     #     #    #    #(old_line,old_val)
     #  #  #  # line_id  val_id  tmpl_old at_old val_old line_old
     m2m_lin_list.append((l[5], l[4]))
-    # old_val_val.append((l[2], l[3], l[4] ))
+    old_val_val.append((l[2], l[3], l[4] ))
 err_val_data = []
 
 for v in product_vals:
@@ -337,13 +410,13 @@ for v in product_vals:
             old_val.append((v[2], v[3]))
 
     #     #    #    #  Pour generer des valeur d'attribut au ligne pour des variantes ayant des valeur non lié à la bonne ligne d'attribut
-        if v[4]!= None and (v[4], v[0]) not in m2m_lin_list:
+        if v[4] != None and (v[4], v[0]) not in m2m_lin_list and (v[2], v[3], v[0]) not in old_val_val:
             line = dict_product_attribute_line.get(
                 str(dict_product_tmpl.get(v[2], None)) + '_' + str(dict_product_attribute.get(v[3], None)), None)
 
             err_val_data.append((line, dict_product_attribute_val.get(v[0], None)))
             old_val.append((v[2], v[3]))
-            # old_val_val.append((v[2], v[3], v[0]))
+            old_val_val.append((v[2], v[3], v[0]))
             m2m_lin_list.append((v[4], v[0]))
 create_product_attribute_line_vals_m2m(err_val_data)
 print('create_product_attribute_line_vals_m2m er done')
@@ -368,11 +441,12 @@ for v in product_vals:
 create_product_template_attribute_value(prod_val_rel_data)
 print('create_product_template_attribute_value done')
 
-product_template_att_value_obj = odoov13.env['product.template.attribute.value']
-product_template_att_value_ids = product_template_att_value_obj.search([])
-product_template_att_value_data = product_template_att_value_obj.read(product_template_att_value_ids,
-                                                                      ['attribute_line_id','product_attribute_value_id'])
-dict_product_template_att_value = {str(part['attribute_line_id'][0])+'_'+str(part['product_attribute_value_id'][0]):part['id']
+# product_template_att_value_obj = odoov13.env['product.template.attribute.value']
+# product_template_att_value_ids = product_template_att_value_obj.search([])
+# product_template_att_value_data = product_template_att_value_obj.read(product_template_att_value_ids,
+#                                                                       ['attribute_line_id','product_attribute_value_id'])
+product_template_att_value_data = get_product_template_att_value()
+dict_product_template_att_value = {str(part[1])+'_'+str(part[2]):part[0]
                                    for part in product_template_att_value_data}
 line_dict = {}
 lines = get_attribute_line_new()
@@ -397,9 +471,12 @@ for v in product_vals:
 print('done repeat', done_old)
 create_product_attribute_rel(product_vals_rel_data)
 print('create_product_attribute_rel done')
+probleme_data = []
 for line in done_old:
-    product_prod.write([line[0]], {'probleme': str(line)})
+    date = (line[0], str(line))
+    probleme_data.append(data)
 
+update_product_probleme(probleme_data)
 
 
 
