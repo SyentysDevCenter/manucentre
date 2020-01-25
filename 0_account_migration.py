@@ -1,14 +1,15 @@
 import odoorpc
 import psycopg2
-USER = 'odoo13'
-PASSWORD = 'odoo'
-USER_source = 'openpg'
-PASSWORD_source = 'openpgpwd'
+
+USER = 'admin'
+PASSWORD = 'a'
+USER_source = 'odoo'
+PASSWORD_source = 'oodoo'
 HOST = "127.0.0.1"
-Port_source = "5433"
+Port_source = "5432"
 Port_dest = "5432"
-DB_souce = 'manucentre_last9'
-DB_dest = 'manucentre1'
+DB_souce = 'MANU_LAST_DB'
+DB_dest = 'MANUCENTRE_MIGRATION_SCRIPT'
 
 Companies_map = {1:1}
 
@@ -59,6 +60,7 @@ def get_account_types():
             if(connection):
                 cursor.close()
                 connection.close()
+
 def get_account_src_types():
     try:
         connection = psycopg2.connect(user = USER_source,
@@ -127,17 +129,10 @@ def update_currents_accounts(accounts):
                 cursor.close()
                 connection.close()
 
-# Login to source server
-odoo = odoorpc.ODOO('localhost', port=8091)
-odoo.login('manucentre_last9', 'admin', 'a')
-
 # Login to destination server
 odoov13 = odoorpc.ODOO('localhost', port=8069)
 odoov13.login('manucentre1', 'admin', 'a')
 
-
-# account_type_ids  = odoo.env['account.account.type'].search([])
-# # # # # # # at.name, at.id, tr.value
 account_type_ids  =  get_account_types()
 account_type_src_ids  =  get_account_src_types()
 acc_dict = {}
