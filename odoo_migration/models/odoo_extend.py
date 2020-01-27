@@ -1,6 +1,12 @@
 from odoo import api, fields, models
 
 
+class AccountPaymentTerm(models.Model):
+    _inherit = 'account.payment.term'
+
+    old_id = fields.Integer(string='Old id', readonly=True)
+    probleme = fields.Char()
+
 class Product(models.Model):
     _inherit = 'product.product'
 
