@@ -1,30 +1,53 @@
 import odoorpc
 import psycopg2
 
-USER_odoo = 'admin'
-PASSWORD_odoo = 'a'
-USER_source = 'openpg'
-PASSWORD_source = 'openpgpwd'
-USER = 'odoo13'
-PASSWORD = 'odoo'
-HOST = "127.0.0.1"
-Port_source = "5433"
-Port_dest = "5432"
-DB_souce = 'manucentre9'
-DB_dest = 'manucentre4'
+# SOURCE
+SOURCE_HOST = "localhost"
+SOURCE_USER = 'openpg'
+SOURCE_PASSWORD = 'openpgpwd'
+SOURCE_PORT = "5433"
+SOURCE_DB = 'manucentre9'
 
-Companies_map = {1:1}
+# DEST
+DEST_ODOO_USER = 'admin'
+DEST_ODOO_PASSWORD = 'a'
+DEST_USER = 'odoo13'
+DEST_PASSWORD = 'odoo'
+DEST_DB = 'manucentre4'
+DEST_HOST = "localhost"
+DEST_PORT = "5432"
+ODOO_DEST_PORT = "8069"
+
+
+#Company_mapping
+company_map = {
+    '1':'1',
+    '22':'13',
+    '24':'11',
+    '25':'12',
+    '26':'13',
+}
+
+#Account config
+account_code_length = 7
+
+def update_account_code_length():
+    odoov13 = odoorpc.ODOO(DEST_HOST, port=ODOO_DEST_PORT)
+    odoov13.login(DEST_DB, DEST_ODOO_USER, DEST_ODOO_PASSWORD)
+
+    account_ids = odoov13.env['account.account'].search([])
+    for acc in odoov13.env['account.account'].browse(account_ids):
+        acc.code = acc.code.ljust(account_code_length, '0')
 
 def get_accounts():
     try:
-        connection = psycopg2.connect(user = USER_source,
-                                      password = PASSWORD_source,
-                                      host = HOST,
-                                      port = Port_source,
-                                      database = DB_souce)
-
+        connection = psycopg2.connect(user = SOURCE_USER,
+                                      password = SOURCE_PASSWORD,
+                                      host = SOURCE_HOST,
+                                      port = SOURCE_PORT,
+                                      database = SOURCE_DB)
         cursor = connection.cursor()
-        query = f"select a.name,a.code,a.reconcile,a.user_type_id, at.name,a.id, a.company_id, tr.value " \
+        query = f"select a.id,a.company_id,a.code,a.name,a.user_type_id,a.reconcile,at.name, tr.value " \
                 f"from account_account a, account_account_type at, ir_translation tr " \
                 f"where a.user_type_id=at.id and tr.res_id=at.id and " \
                 f"tr.name='account.account.type,name' and tr.lang = 'fr_FR'" \
@@ -39,13 +62,14 @@ def get_accounts():
             if(connection):
                 cursor.close()
                 connection.close()
+
 def get_account_types():
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         query = f"select at.name , at.id , at.name, tr.value " \
@@ -65,11 +89,11 @@ def get_account_types():
 
 def get_account_src_types():
     try:
-        connection = psycopg2.connect(user = USER_source,
-                                      password = PASSWORD_source,
-                                      host = HOST,
-                                      port = Port_source,
-                                      database = DB_souce)
+        connection = psycopg2.connect(user = SOURCE_USER,
+                                      password = SOURCE_PASSWORD,
+                                      host = SOURCE_HOST,
+                                      port = SOURCE_PORT,
+                                      database = SOURCE_DB)
 
         cursor = connection.cursor()
         query = f"select at.name , at.id , at.name, tr.value " \
@@ -89,14 +113,14 @@ def get_account_src_types():
 
 def get_currents_accounts():
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
-        query = f"select a.name,a.code,a.reconcile,a.user_type_id,at.name,a.id, a.company_id, tr.value " \
+        query = f"select a.id,a.company_id,a.code,a.name,a.reconcile,a.user_type_id,at.name, tr.value " \
                 f"from account_account a, account_account_type at, ir_translation tr " \
                 f"where a.user_type_id=at.id and tr.res_id=at.id and " \
                 f"tr.name='account.account.type,name' and tr.lang = 'fr_FR';"
@@ -111,17 +135,16 @@ def get_currents_accounts():
                 cursor.close()
                 connection.close()
 
-def update_currents_accounts(accounts):
+def update_currents_accounts(account_id,old_id):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
-        for c in accounts:
-            cursor.execute(f"update account_account set old_id = %s , user_type_id = %s where id = %s;", (c[0], c[1], c[2]))
+        cursor.execute(f"update account_account set old_id = %s where id = %s;", (old_id,account_id))
         connection.commit()
 
     except (Exception, psycopg2.Error) as error :
@@ -132,8 +155,8 @@ def update_currents_accounts(accounts):
                 connection.close()
 
 # Login to destination server
-odoov13 = odoorpc.ODOO('localhost', port=8069)
-odoov13.login('manucentre4', 'admin', 'a')
+odoov13 = odoorpc.ODOO(DEST_HOST, port=ODOO_DEST_PORT)
+odoov13.login(DEST_DB, DEST_ODOO_USER, DEST_ODOO_PASSWORD)
 
 account_type_ids  =  get_account_types()
 account_type_src_ids  =  get_account_src_types()
@@ -144,49 +167,41 @@ for acc_type in account_type_ids:
 for acc_type in account_type_src_ids:
     acc_src_dict[acc_type[2]] = acc_type[1]
 
-current_accounts = get_currents_accounts()
-#
-earing_type = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'data_unaffected_earnings'], {})
-earing9_type = acc_src_dict.get("Bénéfices de l'année en cours", None)
-
-current_dict = {}
-earing_type_exist = False
-for c in current_accounts :
-    current_dict[c[1]] = c[5]
-    if c[3] == earing_type[1]:
-        earing_type_exist = c[5]
-        update_currents_accounts([(None, acc_dict.get('Other Income', None), c[5])])
-print('current_dict', current_dict)
+type_mapping = {}
+for src_type in acc_src_dict:
+    if acc_dict.get(src_type,False):
+        type_mapping[acc_src_dict[src_type]]=acc_dict.get(src_type,False)
+    else:
+        if src_type == 'Direct Costs':
+            type_mapping[acc_src_dict[src_type]] = acc_dict.get('Expenses', False)
 
 account_ids = get_accounts()
+current_accounts = get_currents_accounts()
+
+current_account_dict = {}
+for account in current_accounts:
+    current_account_dict[','.join([account[2],str(account[1])])]=account[0]
+
 list_data = []
-update_currents = []
-for acc in account_ids:
-    company = Companies_map.get(acc[6], False)
-    if company != False:
-        if not acc_dict.get(acc[4], False):
-            type = acc_dict.get('Other Income', None)
+to_create = {}
+for src_account in account_ids:
+    if str(src_account[1]) in company_map.keys():
+        comany = company_map[str(src_account[1])]
+        code_comapny = ','.join([src_account[2],comany])
+        if current_account_dict.get(code_comapny,False):
+            update_currents_accounts(current_account_dict[code_comapny],src_account[0])
         else:
-            type = acc_dict.get(acc[4], None)
-        print('acccccc', acc, acc_dict.get(acc[4], None))
-        if acc[1] not in current_dict:
-            list_data.append({
-                            'name': acc[0],
-                            'code': acc[1],
-                            'reconcile' : acc[2],
-                            'user_type_id': type,
-                            'old_id': acc[5],
-                            'company_id': company
-                         })
+            if not to_create.get(code_comapny,False):
+                to_create[code_comapny]=True
+                list_data.append({
+                    'name': src_account[3],
+                    'code': src_account[2],
+                    'reconcile': src_account[5],
+                    'user_type_id': type_mapping[src_account[4]],
+                    'company_id':int(comany),
+                    'old_id': src_account[0],
+                })
 
-        if acc[1] in current_dict :
-            update_currents.append((acc[5], type, current_dict[acc[1]]))
-        # if earing_type_exist and acc[3] == earing9_type:
-        #     update_currents.append((acc[5], acc_dict.get(acc[4], None), earing_type_exist))
-
-update_currents_accounts(update_currents)
 result = odoov13.execute(
     'account.account', 'create',
     list_data)
-
-

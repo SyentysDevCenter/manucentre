@@ -204,7 +204,6 @@ dict_product_prod = {part['old_id']: part['id'] for part in product_prod_data}
 
 prices = get_prices()
 list_p_p = []
-print('ddddddd',prices)
 for p in prices:
     if dict_part.get(p[0],False) and dict_product_tmpl.get(p[1],False):
         data = (
@@ -249,5 +248,5 @@ for p in prices:
             if product_id:
                 product_price.append(('standard_price', 'product.product,'+str(product_id), company,standard_price_field[1],float(p[0]) ,'float' ))
 update_standard_price(product_price)
-
+print('prix standard done')
 # # # # # # #(name, res_id, company_id, fields_id, value_float, type)
