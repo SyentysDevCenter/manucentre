@@ -4,17 +4,17 @@ from datetime import date, datetime
 
 # SOURCE
 SOURCE_HOST = "localhost"
-SOURCE_USER = 'odoo'
-SOURCE_PASSWORD = 'odoo'
-SOURCE_PORT = "5432"
-SOURCE_DB = 'MANU_LAST_DB'
+SOURCE_USER = 'openpg'
+SOURCE_PASSWORD = 'openpgpwd'
+SOURCE_PORT = "5433"
+SOURCE_DB = 'manucentre9'
 
 # DEST
 DEST_ODOO_USER = 'admin'
 DEST_ODOO_PASSWORD = 'a'
-DEST_USER = 'odoo'
+DEST_USER = 'odoo13'
 DEST_PASSWORD = 'odoo'
-DEST_DB = 'MANUCENTRE_MIGRATION_SCRIPT_T2'
+DEST_DB = 'manucentre4'
 DEST_HOST = "localhost"
 DEST_PORT = "5432"
 ODOO_DEST_PORT = "8069"
@@ -27,6 +27,7 @@ company_map = {
     '25': '12',
     '26': '13',
 }
+
 
 
 def get_property_account_payable_id():
@@ -51,6 +52,28 @@ def get_property_account_payable_id():
             connection.close()
 
 
+
+def create_properties(properties):
+    try:
+        connection = psycopg2.connect(user=DEST_USER,
+                                      password=DEST_PASSWORD,
+                                      host=DEST_HOST,
+                                      port=DEST_PORT,
+                                      database=DEST_DB)
+
+        cursor = connection.cursor()
+        for p in properties:
+            cursor.execute("INSERT INTO ir_property (name,res_id,fields_id,value_reference,type,company_id)"
+                           "VALUES(%s, %s, %s, %s, %s,%s)",
+                           (p[0], p[1], p[2], p[3], p[4], p[5]))
+        connection.commit()
+    except (Exception, psycopg2.Error) as error:
+        print("Error while connecting to PostgreSQL", error)
+    finally:
+        if (connection):
+            cursor.close()
+            connection.close()
+
 def get_payment_term():
     try:
         connection = psycopg2.connect(user=SOURCE_USER,
@@ -73,27 +96,6 @@ def get_payment_term():
             cursor.close()
             connection.close()
 
-
-def create_properties(properties):
-    try:
-        connection = psycopg2.connect(user=DEST_USER,
-                                      password=DEST_PASSWORD,
-                                      host=DEST_HOST,
-                                      port=DEST_PORT,
-                                      database=DEST_DB)
-
-        cursor = connection.cursor()
-        for p in properties:
-            cursor.execute("INSERT INTO ir_property (name,res_id,fields_id,value_reference,type,company_id)"
-                           "VALUES(%s, %s, %s, %s, %s,%s)",
-                           (p[0], p[1], p[2], p[3], p[4], p[5]))
-        connection.commit()
-    except (Exception, psycopg2.Error) as error:
-        print("Error while connecting to PostgreSQL", error)
-    finally:
-        if (connection):
-            cursor.close()
-            connection.close()
 
 
 def set_parents(partners):
@@ -149,7 +151,6 @@ def create_partners(partners):
             cursor.close()
             connection.close()
 
-
 def get_partners():
     try:
         connection = psycopg2.connect(user=SOURCE_USER,
@@ -186,10 +187,12 @@ def get_partners():
 odoov13 = odoorpc.ODOO(DEST_HOST, port=ODOO_DEST_PORT)
 odoov13.login(DEST_DB, DEST_ODOO_USER, DEST_ODOO_PASSWORD)
 
+
 pay_terms = get_payment_term()
 account_payment_term_obj = odoov13.env['account.payment.term']
 current_pay_ids = account_payment_term_obj.search([])
 account_payment_term_obj.browse(current_pay_ids).unlink()
+
 
 payment_ids = {}
 for pay in pay_terms:
@@ -221,29 +224,6 @@ new_pt_ids = account_payment_term_obj.search([])
 pay_term_data = account_payment_term_obj.read(new_pt_ids, ['old_id'])
 dict_pay_term = {pt['old_id']: pt['id'] for pt in pay_term_data}
 
-"""
-payment_term = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'account_payment_term_30days'], {})
-
-account = odoov13.env['account.account']
-
-customer = account.search([('code','=','411100')],limit=1)
-if not customer:
-    raise Exception('No customer account is defined!')
-supplier = account.search([('code','=','401100')],limit=1)
-if not supplier:
-    raise Exception('No supplier account is defined!')
-print("customer,supplier",customer,supplier)
-
-res_state = odoov13.env['res.country.state']
-state_ids = res_state.search([])
-state_data = res_state.read(state_ids, ['old_id'])
-dict_state = {part['old_id']:part['id'] for part in state_data}
-
-partner13 = odoov13.env['res.partner']
-account_ids = account.search([])
-account_data = account.read(account_ids, ['old_id'])
-dict_account = {acc['old_id']:acc['id'] for acc in account_data}
-"""
 
 res_state = odoov13.env['res.country.state']
 state_ids = res_state.search([])
@@ -267,6 +247,7 @@ for part in get_partners():
     siret, part[30])
     list_data.append(data)
 create_partners(list_data)
+
 
 partner13 = odoov13.env['res.partner']
 partners = partner13.search([('old_id', '!=', False)])
@@ -309,34 +290,58 @@ for pay_prop in property_account_payable_ids:
         property_account_payable_data.append(account_payable_data)
 create_properties(property_account_payable_data)
 
-"""
-data_payment_term_data = []
-data_payment_supplier_term_data = []
-property_account_receivable_data = []
-property_account_payable_data = []
-
-payment_term_field = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'field_res_partner__property_payment_term_id'], {})
-payment_term_supplier_field = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'field_res_partner__property_supplier_payment_term_id'], {})
-property_account_receivable_field = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'field_res_partner__property_account_receivable_id'], {})
-property_account_payable_field = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'field_res_partner__property_account_payable_id'], {})
-partners = partner13.search([('old_id', '!=', False)])
-
-old_parts = partner13.read(partners, ['old_id'])
-old_list_ids = {part['old_id']:part['id'] for part in old_parts}
 #
+# account = odoov13.env['account.account']
+#
+# customer = account.search([('code','=','411100')],limit=1)
+# if not customer:
+#     raise Exception('No customer account is defined!')
+# supplier = account.search([('code','=','401100')],limit=1)
+# if not supplier:
+#     raise Exception('No supplier account is defined!')
+# print("customer,supplier",customer,supplier)
+#
+# res_state = odoov13.env['res.country.state']
+# state_ids = res_state.search([])
+# state_data = res_state.read(state_ids, ['old_id'])
+# dict_state = {part['old_id']:part['id'] for part in state_data}
+#
+# partner13 = odoov13.env['res.partner']
+# account_ids = account.search([])
+# account_data = account.read(account_ids, ['old_id'])
+# dict_account = {acc['old_id']:acc['id'] for acc in account_data}
 
-for d in accounts_data:
-    payment_data = ('property_payment_term_id', 'res.partner,'+str(old_list_ids.get(d[0], False)),payment_term_field[1],'account.payment.term,'+str(payment_term[1]),"many2one")
-    payment_supplier_data = ('property_supplier_payment_term_id', 'res.partner,'+str(old_list_ids.get(d[0], False)),payment_term_supplier_field[1],'account.payment.term,'+str(payment_term[1]),"many2one")
-    account_receivable_data = ('property_account_receivable_id', 'res.partner,'+str(old_list_ids.get(d[0], False)), property_account_receivable_field[1],'account.account,'+str(d[2]),"many2one")
-    account_payable_data = ('property_account_payable_id','res.partner,'+str(old_list_ids.get(d[0], False)),property_account_payable_field[1],'account.account,'+str(d[1]),"many2one")
-    data_payment_term_data.append(payment_data)
-    data_payment_supplier_term_data.append(payment_supplier_data)
-    property_account_receivable_data.append(account_receivable_data)
-    property_account_payable_data.append(account_payable_data)
 
-create_properties(data_payment_term_data)
-create_properties(data_payment_supplier_term_data)
-create_properties(property_account_receivable_data)
-create_properties(property_account_payable_data)
-"""
+# data_payment_term_data = []
+# data_payment_supplier_term_data = []
+# property_account_receivable_data = []
+# property_account_payable_data = []
+#
+# payment_term_field = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'field_res_partner__property_payment_term_id'], {})
+# payment_term_supplier_field = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'field_res_partner__property_supplier_payment_term_id'], {})
+# property_account_receivable_field = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'field_res_partner__property_account_receivable_id'], {})
+# property_account_payable_field = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['account', 'field_res_partner__property_account_payable_id'], {})
+# partners = partner13.search([('old_id', '!=', False)])
+#
+# old_parts = partner13.read(partners, ['old_id'])
+# old_list_ids = {part['old_id']:part['id'] for part in old_parts}
+# #
+# for d in accounts_data:
+#     payment_data = ('property_payment_term_id', 'res.partner,'+str(old_list_ids.get(d[0], False)),payment_term_field[1],'account.payment.term,'+str(payment_term[1]),"many2one")
+#     payment_supplier_data = ('property_supplier_payment_term_id', 'res.partner,'+str(old_list_ids.get(d[0], False)),payment_term_supplier_field[1],'account.payment.term,'+str(payment_term[1]),"many2one")
+#     account_receivable_data = ('property_account_receivable_id', 'res.partner,'+str(old_list_ids.get(d[0], False)), property_account_receivable_field[1],'account.account,'+str(d[2]),"many2one")
+#     account_payable_data = ('property_account_payable_id','res.partner,'+str(old_list_ids.get(d[0], False)),property_account_payable_field[1],'account.account,'+str(d[1]),"many2one")
+#     data_payment_term_data.append(payment_data)
+#     data_payment_supplier_term_data.append(payment_supplier_data)
+#     property_account_receivable_data.append(account_receivable_data)
+#     property_account_payable_data.append(account_payable_data)
+#
+#
+# create_properties(data_payment_term_data)
+# create_properties(data_payment_supplier_term_data)
+# create_properties(property_account_receivable_data)
+# create_properties(property_account_payable_data)
+
+# print('old_list_ids',old_list_ids)
+
+
