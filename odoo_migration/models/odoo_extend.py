@@ -17,6 +17,7 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     old_id = fields.Integer(string='Old id', readonly=True)
+    probleme_variante = fields.Boolean()
 
 class ProductCateg(models.Model):
     _inherit = 'product.category'

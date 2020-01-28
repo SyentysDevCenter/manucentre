@@ -9,7 +9,7 @@ HOST = "127.0.0.1"
 Port_source = "5433"
 Port_dest = "5432"
 DB_souce = 'manucentre_last9'
-DB_dest = 'manucentre2'
+DB_dest = 'manucentre4'
 
 
 
@@ -123,11 +123,11 @@ def create_prices(prices):
 
 # Login to source server
 odoo = odoorpc.ODOO('localhost', port=8091)
-odoo.login('manucentre_last9', 'admin', 'a')
+odoo.login('manucentre9', 'admin', 'a')
 
 # Login to destination server
 odoov13 = odoorpc.ODOO('localhost', port=8069)
-odoov13.login('manucentre2', 'admin', 'a')
+odoov13.login('manucentre4', 'admin', 'a')
 
 partner = odoo.env['res.partner']
 

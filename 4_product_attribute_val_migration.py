@@ -1,15 +1,18 @@
 import odoorpc
 import psycopg2
 
-USER = 'odoo13'
-PASSWORD = 'odoo'
+USER_odoo = 'admin'
+PASSWORD_odoo = 'a'
 USER_source = 'openpg'
 PASSWORD_source = 'openpgpwd'
+USER = 'odoo13'
+PASSWORD = 'odoo'
 HOST = "127.0.0.1"
 Port_source = "5433"
 Port_dest = "5432"
-DB_souce = 'manucentre_last9'
-DB_dest = 'manucentre2'
+DB_souce = 'manucentre9'
+DB_dest = 'manucentre4'
+
 
 
 def get_product_attribute_line():
@@ -126,6 +129,46 @@ def update_product_probleme(vals):
 
             cursor.execute("""Update product_product set probleme = %s where id = %s""",
                            (p[0], p[1]))
+        connection.commit()
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
+    finally:
+            if(connection):
+                cursor.close()
+                connection.close()
+def update_probleme_variante_tmpl(vals):
+    try:
+        connection = psycopg2.connect(user = USER,
+                                      password = PASSWORD,
+                                      host = HOST,
+                                      port = Port_dest,
+                                      database = DB_dest)
+
+        cursor = connection.cursor()
+        for p in vals:
+
+            cursor.execute("""Update product_template set probleme_variante = True where id = %s""",
+                           (p,))
+        connection.commit()
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
+    finally:
+            if(connection):
+                cursor.close()
+                connection.close()
+
+def update_archive_product(vals):
+    try:
+        connection = psycopg2.connect(user = USER,
+                                      password = PASSWORD,
+                                      host = HOST,
+                                      port = Port_dest,
+                                      database = DB_dest)
+
+        cursor = connection.cursor()
+        for p in vals:
+            cursor.execute("""Update product_product set active = False where id = %s""",
+                           (p,))
         connection.commit()
     except (Exception, psycopg2.Error) as error :
         print ("Error while connecting to PostgreSQL", error)
@@ -296,6 +339,61 @@ def get_product_template_att_lines():
                 cursor.close()
                 connection.close()
 
+
+def get_product_product_combination():
+
+    try:
+        connection = psycopg2.connect(user=USER,
+                                      password=PASSWORD,
+                                      host=HOST,
+                                      port=Port_dest,
+                                      database=DB_dest)
+
+        cursor = connection.cursor()
+
+        query = """select distinct p.product_product_id, pa.product_tmpl_id, ARRAY (select pp.product_template_attribute_value_id
+					   from product_variant_combination pp where p.product_product_id = pp.product_product_id)
+					   from  product_variant_combination p 
+					   left join product_product pa on p.product_product_id = pa.id 
+					   group by p.product_product_id, pa.product_tmpl_id
+					   order by  pa.product_tmpl_id
+
+                        ;"""
+
+        cursor.execute(query)
+        record = cursor.fetchall()
+        return record
+    except (Exception, psycopg2.Error) as error:
+        print("Error while connecting to PostgreSQL", error)
+    finally:
+        if (connection):
+            cursor.close()
+            connection.close()
+
+
+def update_product_combination_indices(vals):
+
+
+    # v.att_id, v.prod_id, p.product_tmpl_id, t.attribute_id, l.id(products):
+    try:
+        connection = psycopg2.connect(user = USER,
+                                      password = PASSWORD,
+                                      host = HOST,
+                                      port = Port_dest,
+                                      database = DB_dest)
+
+        cursor = connection.cursor()
+        for p in vals:
+            cursor.execute("UPDATE product_product set combination_indices= %s where id = %s",
+                           (p[0], p[1]))
+        connection.commit()
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
+    finally:
+            if(connection):
+                cursor.close()
+                connection.close()
+
 def create_product_attribute_rel(vals):
 
 
@@ -323,11 +421,11 @@ def create_product_attribute_rel(vals):
 
 # Login to source server
 odoo = odoorpc.ODOO('localhost', port=8091)
-odoo.login('manucentre_last9', 'admin', 'a')
+odoo.login('manucentre9', 'admin', 'a')
 
 # Login to destination server
 odoov13 = odoorpc.ODOO('localhost', port=8069)
-odoov13.login('manucentre2', 'admin', 'a')
+odoov13.login('manucentre4', 'admin', 'a')
 
 product_tmpl = odoov13.env['product.template']
 product_tmpl_ids = product_tmpl.search(['|', ('active', '=', True),('active', '=', False)])
@@ -342,8 +440,9 @@ dict_product_attribute = {part['old_id']:part['id'] for part in product_attribut
 attribute_line = get_product_attribute_line()
 line_list = []
 for l in attribute_line:
-    data = (l[0], dict_product_tmpl.get(l[1],None), dict_product_attribute.get(l[2],None))
-    line_list.append(data)
+    if not dict_product_tmpl.get(l[1], None):
+        data = (l[0], dict_product_tmpl.get(l[1], None), dict_product_attribute.get(l[2],None))
+        line_list.append(data)
 create_product_template_attribute_line(line_list)
 print("line d'attribut done")
 
@@ -442,10 +541,7 @@ for v in product_vals:
 create_product_template_attribute_value(prod_val_rel_data)
 print('create_product_template_attribute_value done')
 
-# product_template_att_value_obj = odoov13.env['product.template.attribute.value']
-# product_template_att_value_ids = product_template_att_value_obj.search([])
-# product_template_att_value_data = product_template_att_value_obj.read(product_template_att_value_ids,
-#                                                                       ['attribute_line_id','product_attribute_value_id'])
+
 product_template_att_value_data = get_product_template_att_value()
 dict_product_template_att_value = {str(part[1])+'_'+str(part[2]):part[0]
                                    for part in product_template_att_value_data}
@@ -479,6 +575,26 @@ for line in done_old:
 
 update_product_probleme(probleme_data)
 
+combinations = get_product_product_combination()
+combination_data = []
+att_dupl = []
+# # # # # # # article ayant deux valeur du meme attribut
+archiv_product = []
+probleme_variante_tmpl = []
+for comb in combinations:
+    if (comb[1], comb[2]) not in att_dupl:
+        c = str(comb[2]).replace('{','').replace('}','')
+        combination_data.append((c , comb[0]))
+        att_dupl.append((comb[1], comb[2]))
+    else:
+        probleme_variante_tmpl.append(comb[1])
+        archiv_product.append(comb[0])
+update_probleme_variante_tmpl(probleme_variante_tmpl)
+update_archive_product(archiv_product)
+
+
+update_product_combination_indices(combination_data)
+print('combination_indices done')
 
 
 

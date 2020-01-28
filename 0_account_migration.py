@@ -1,15 +1,17 @@
 import odoorpc
 import psycopg2
 
-USER = 'admin'
-PASSWORD = 'a'
-USER_source = 'odoo'
-PASSWORD_source = 'oodoo'
+USER_odoo = 'admin'
+PASSWORD_odoo = 'a'
+USER_source = 'openpg'
+PASSWORD_source = 'openpgpwd'
+USER = 'odoo13'
+PASSWORD = 'odoo'
 HOST = "127.0.0.1"
-Port_source = "5432"
+Port_source = "5433"
 Port_dest = "5432"
-DB_souce = 'MANU_LAST_DB'
-DB_dest = 'MANUCENTRE_MIGRATION_SCRIPT'
+DB_souce = 'manucentre9'
+DB_dest = 'manucentre4'
 
 Companies_map = {1:1}
 
@@ -131,7 +133,7 @@ def update_currents_accounts(accounts):
 
 # Login to destination server
 odoov13 = odoorpc.ODOO('localhost', port=8069)
-odoov13.login('manucentre1', 'admin', 'a')
+odoov13.login('manucentre4', 'admin', 'a')
 
 account_type_ids  =  get_account_types()
 account_type_src_ids  =  get_account_src_types()
@@ -153,9 +155,7 @@ for c in current_accounts :
     current_dict[c[1]] = c[5]
     if c[3] == earing_type[1]:
         earing_type_exist = c[5]
-        print('fffffffff',earing_type_exist,earing_type  )
-        update_currents_accounts([(None, acc_dict.get('Passif à court terme', None), c[5])])
-
+        update_currents_accounts([(None, acc_dict.get('Other Income', None), c[5])])
 print('current_dict', current_dict)
 
 account_ids = get_accounts()
