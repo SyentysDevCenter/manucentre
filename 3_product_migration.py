@@ -1,26 +1,35 @@
 import odoorpc
 import psycopg2
-USER_odoo = 'admin'
-PASSWORD_odoo = 'a'
-USER_source = 'openpg'
-PASSWORD_source = 'openpgpwd'
-USER = 'odoo13'
-PASSWORD = 'odoo'
-HOST = "127.0.0.1"
-Port_source = "5433"
-Port_dest = "5432"
-DB_souce = 'manucentre9'
-DB_dest = 'manucentre4'
+import databaseconfig as cfg
+
+# SOURCE
+SOURCE_HOST =cfg.source_connect['SOURCE_HOST']
+SOURCE_USER =cfg.source_connect['SOURCE_USER']
+SOURCE_PASSWORD = cfg.source_connect['SOURCE_PASSWORD']
+SOURCE_PORT = cfg.source_connect['SOURCE_PORT']
+SOURCE_DB = cfg.source_connect['SOURCE_DB']
+SOURCE_ODOO_USER = cfg.source_connect['SOURCE_ODOO_USER']
+SOURCE_ODOO_PASSWORD = cfg.source_connect['SOURCE_ODOO_PASSWORD']
+ODOO_SOURCE_PORT = cfg.source_connect['ODOO_SOURCE_PORT']
+
+# DEST
+DEST_ODOO_USER =cfg.dest_connect['DEST_ODOO_USER']
+DEST_ODOO_PASSWORD = cfg.dest_connect['DEST_ODOO_PASSWORD']
+DEST_USER = cfg.dest_connect['DEST_USER']
+DEST_PASSWORD = cfg.dest_connect['DEST_PASSWORD']
+DEST_DB = cfg.dest_connect['DEST_DB']
+DEST_HOST = cfg.dest_connect['DEST_HOST']
+DEST_PORT = cfg.dest_connect['DEST_PORT']
+ODOO_DEST_PORT = cfg.dest_connect['ODOO_DEST_PORT']
 
 
 def get_product_product():
     try:
-        connection = psycopg2.connect(user = USER_source,
-                                      password = PASSWORD_source,
-                                      host = HOST,
-                                      port = Port_source,
-                                      database = DB_souce)
-
+        connection = psycopg2.connect(user = SOURCE_USER,
+                                      password = SOURCE_PASSWORD,
+                                      host = SOURCE_HOST,
+                                      port = SOURCE_PORT,
+                                      database = SOURCE_DB)
 
         cursor = connection.cursor()
         query = """
@@ -40,11 +49,11 @@ def get_product_product():
 
 def get_product_categs():
     try:
-        connection = psycopg2.connect(user = USER_source,
-                                      password = PASSWORD_source,
-                                      host = HOST,
-                                      port = Port_source,
-                                      database = DB_souce)
+        connection = psycopg2.connect(user = SOURCE_USER,
+                                      password = SOURCE_PASSWORD,
+                                      host = SOURCE_HOST,
+                                      port = SOURCE_PORT,
+                                      database = SOURCE_DB)
 
 
         cursor = connection.cursor()
@@ -65,11 +74,11 @@ def get_product_categs():
 
 def create_product_category(categs, parent):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         if not parent:
@@ -93,11 +102,11 @@ def create_product_category(categs, parent):
 
 def get_products():
     try:
-        connection = psycopg2.connect(user = USER_source,
-                                      password = PASSWORD_source,
-                                      host = HOST,
-                                      port = Port_source,
-                                      database = DB_souce)
+        connection = psycopg2.connect(user = SOURCE_USER,
+                                      password = SOURCE_PASSWORD,
+                                      host = SOURCE_HOST,
+                                      port = SOURCE_PORT,
+                                      database = SOURCE_DB)
 
 
         cursor = connection.cursor()
@@ -123,11 +132,11 @@ def get_products():
 
 def create_products(products):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         for p in products:
@@ -162,11 +171,11 @@ def create_products(products):
 
 def create_product_products(products):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         for p in products:
@@ -184,12 +193,12 @@ def create_product_products(products):
 
 
 # Login to source server
-odoo = odoorpc.ODOO('localhost', port=8091)
-odoo.login('manucentre9', 'admin', 'a')
+odoo = odoorpc.ODOO(SOURCE_HOST, port=ODOO_SOURCE_PORT)
+odoo.login(SOURCE_DB,SOURCE_ODOO_USER, SOURCE_ODOO_PASSWORD)
 
 # Login to destination server
-odoov13 = odoorpc.ODOO('localhost', port=8069)
-odoov13.login('manucentre4', 'admin', 'a')
+odoov13 = odoorpc.ODOO(DEST_HOST, port=ODOO_DEST_PORT)
+odoov13.login(DEST_DB, DEST_ODOO_USER, DEST_ODOO_PASSWORD)
 
 
 categ = odoov13.env['product.category']

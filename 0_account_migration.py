@@ -1,32 +1,27 @@
 import odoorpc
 import psycopg2
+import databaseconfig as cfg
 
 # SOURCE
-SOURCE_HOST = "localhost"
-SOURCE_USER = 'openpg'
-SOURCE_PASSWORD = 'openpgpwd'
-SOURCE_PORT = "5433"
-SOURCE_DB = 'manucentre9'
+SOURCE_HOST =cfg.source_connect['SOURCE_HOST']
+SOURCE_USER =cfg.source_connect['SOURCE_USER']
+SOURCE_PASSWORD = cfg.source_connect['SOURCE_PASSWORD']
+SOURCE_PORT = cfg.source_connect['SOURCE_PORT']
+SOURCE_DB = cfg.source_connect['SOURCE_DB']
 
 # DEST
-DEST_ODOO_USER = 'admin'
-DEST_ODOO_PASSWORD = 'a'
-DEST_USER = 'odoo13'
-DEST_PASSWORD = 'odoo'
-DEST_DB = 'manucentre4'
-DEST_HOST = "localhost"
-DEST_PORT = "5432"
-ODOO_DEST_PORT = "8069"
+DEST_ODOO_USER =cfg.dest_connect['DEST_ODOO_USER']
+DEST_ODOO_PASSWORD = cfg.dest_connect['DEST_ODOO_PASSWORD']
+DEST_USER = cfg.dest_connect['DEST_USER']
+DEST_PASSWORD = cfg.dest_connect['DEST_PASSWORD']
+DEST_DB = cfg.dest_connect['DEST_DB']
+DEST_HOST = cfg.dest_connect['DEST_HOST']
+DEST_PORT = cfg.dest_connect['DEST_PORT']
+ODOO_DEST_PORT = cfg.dest_connect['ODOO_DEST_PORT']
 
 
 #Company_mapping
-company_map = {
-    '1':'1',
-    '22':'13',
-    '24':'11',
-    '25':'12',
-    '26':'13',
-}
+company_map = cfg.company_map
 
 #Account config
 account_code_length = 7

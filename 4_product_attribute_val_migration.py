@@ -1,27 +1,35 @@
 import odoorpc
 import psycopg2
+import databaseconfig as cfg
 
-USER_odoo = 'admin'
-PASSWORD_odoo = 'a'
-USER_source = 'openpg'
-PASSWORD_source = 'openpgpwd'
-USER = 'odoo13'
-PASSWORD = 'odoo'
-HOST = "127.0.0.1"
-Port_source = "5433"
-Port_dest = "5432"
-DB_souce = 'manucentre9'
-DB_dest = 'manucentre4'
+# SOURCE
+SOURCE_HOST =cfg.source_connect['SOURCE_HOST']
+SOURCE_USER =cfg.source_connect['SOURCE_USER']
+SOURCE_PASSWORD = cfg.source_connect['SOURCE_PASSWORD']
+SOURCE_PORT = cfg.source_connect['SOURCE_PORT']
+SOURCE_DB = cfg.source_connect['SOURCE_DB']
+SOURCE_ODOO_USER = cfg.source_connect['SOURCE_ODOO_USER']
+SOURCE_ODOO_PASSWORD = cfg.source_connect['SOURCE_ODOO_PASSWORD']
+ODOO_SOURCE_PORT = cfg.source_connect['ODOO_SOURCE_PORT']
 
+# DEST
+DEST_ODOO_USER =cfg.dest_connect['DEST_ODOO_USER']
+DEST_ODOO_PASSWORD = cfg.dest_connect['DEST_ODOO_PASSWORD']
+DEST_USER = cfg.dest_connect['DEST_USER']
+DEST_PASSWORD = cfg.dest_connect['DEST_PASSWORD']
+DEST_DB = cfg.dest_connect['DEST_DB']
+DEST_HOST = cfg.dest_connect['DEST_HOST']
+DEST_PORT = cfg.dest_connect['DEST_PORT']
+ODOO_DEST_PORT = cfg.dest_connect['ODOO_DEST_PORT']
 
 
 def get_product_attribute_line():
     try:
-        connection = psycopg2.connect(user = USER_source,
-                                      password = PASSWORD_source,
-                                      host = HOST,
-                                      port = Port_source,
-                                      database = DB_souce)
+        connection = psycopg2.connect(user = SOURCE_USER,
+                                      password = SOURCE_PASSWORD,
+                                      host = SOURCE_HOST,
+                                      port = SOURCE_PORT,
+                                      database = SOURCE_DB)
 
 
         cursor = connection.cursor()
@@ -41,11 +49,11 @@ def get_product_attribute_line():
 
 def get_product_attribute_line_vals_m2m():
     try:
-        connection = psycopg2.connect(user = USER_source,
-                                      password = PASSWORD_source,
-                                      host = HOST,
-                                      port = Port_source,
-                                      database = DB_souce)
+        connection = psycopg2.connect(user = SOURCE_USER,
+                                      password = SOURCE_PASSWORD,
+                                      host = SOURCE_HOST,
+                                      port = SOURCE_PORT,
+                                      database = SOURCE_DB)
 
 
         cursor = connection.cursor()
@@ -64,11 +72,11 @@ def get_product_attribute_line_vals_m2m():
                 connection.close()
 def get_product_product_vals_m2m():
     try:
-        connection = psycopg2.connect(user = USER_source,
-                                      password = PASSWORD_source,
-                                      host = HOST,
-                                      port = Port_source,
-                                      database = DB_souce)
+        connection = psycopg2.connect(user = SOURCE_USER,
+                                      password = SOURCE_PASSWORD,
+                                      host = SOURCE_HOST,
+                                      port = SOURCE_PORT,
+                                      database = SOURCE_DB)
 
 
         cursor = connection.cursor()
@@ -95,11 +103,11 @@ def get_product_product_vals_m2m():
 
 def create_product_attribute_line_vals_m2m(vals):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         for p in vals:
@@ -118,11 +126,11 @@ def create_product_attribute_line_vals_m2m(vals):
 
 def update_product_probleme(vals):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         for p in vals:
@@ -138,11 +146,11 @@ def update_product_probleme(vals):
                 connection.close()
 def update_probleme_variante_tmpl(vals):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         for p in vals:
@@ -159,11 +167,11 @@ def update_probleme_variante_tmpl(vals):
 
 def update_archive_product(vals):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         for p in vals:
@@ -182,11 +190,11 @@ def create_product_template_attribute_value(prod_val_rel_data):
 
     # v.att_id, v.prod_id, p.product_tmpl_id, t.attribute_id, l.id(products):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         for p in prod_val_rel_data:
@@ -205,11 +213,11 @@ def create_product_template_attribute_value(prod_val_rel_data):
 
 def create_product_template_attribute_line(attributes):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         for p in attributes:
@@ -230,11 +238,11 @@ def get_attribute_line_new():
 
     # v.att_id, v.prod_id, p.product_tmpl_id, t.attribute_id, l.id(products):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
 
@@ -261,11 +269,11 @@ def get_m2m_line_val_comb():
 
     #  #  #  # v.att_id, v.prod_id, p.product_tmpl_id, t.attribute_id, l.id(products):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
 
@@ -291,11 +299,11 @@ def get_m2m_line_val_comb():
 
 def get_product_template_att_value():
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
         cursor = connection.cursor()
         query ="""Select r.id , r.attribute_line_id, r.product_attribute_value_id                 
                         from product_template_attribute_value r                         
@@ -315,11 +323,11 @@ def get_product_template_att_lines():
     # product_attribute_line_data = attribute_line_obj.read(product_attribute_line_ids,
     #                                                       ['attribute_id', 'product_tmpl_id'])
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
 
@@ -343,11 +351,11 @@ def get_product_template_att_lines():
 def get_product_product_combination():
 
     try:
-        connection = psycopg2.connect(user=USER,
-                                      password=PASSWORD,
-                                      host=HOST,
-                                      port=Port_dest,
-                                      database=DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
 
@@ -376,11 +384,11 @@ def update_product_combination_indices(vals):
 
     # v.att_id, v.prod_id, p.product_tmpl_id, t.attribute_id, l.id(products):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         for p in vals:
@@ -399,11 +407,11 @@ def create_product_attribute_rel(vals):
 
     # v.att_id, v.prod_id, p.product_tmpl_id, t.attribute_id, l.id(products):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         for p in vals:
@@ -420,12 +428,12 @@ def create_product_attribute_rel(vals):
                 connection.close()
 
 # Login to source server
-odoo = odoorpc.ODOO('localhost', port=8091)
-odoo.login('manucentre9', 'admin', 'a')
+odoo = odoorpc.ODOO(SOURCE_HOST, port=ODOO_SOURCE_PORT)
+odoo.login(SOURCE_DB,SOURCE_ODOO_USER, SOURCE_ODOO_PASSWORD)
 
 # Login to destination server
-odoov13 = odoorpc.ODOO('localhost', port=8069)
-odoov13.login('manucentre4', 'admin', 'a')
+odoov13 = odoorpc.ODOO(DEST_HOST, port=ODOO_DEST_PORT)
+odoov13.login(DEST_DB, DEST_ODOO_USER, DEST_ODOO_PASSWORD)
 
 product_tmpl = odoov13.env['product.template']
 product_tmpl_ids = product_tmpl.search(['|', ('active', '=', True),('active', '=', False)])
@@ -440,8 +448,8 @@ dict_product_attribute = {part['old_id']:part['id'] for part in product_attribut
 attribute_line = get_product_attribute_line()
 line_list = []
 for l in attribute_line:
-    if not dict_product_tmpl.get(l[1], None):
-        data = (l[0], dict_product_tmpl.get(l[1], None), dict_product_attribute.get(l[2],None))
+    if dict_product_tmpl.get(l[1], False):
+        data = (l[0], dict_product_tmpl.get(l[1], None), dict_product_attribute.get(l[2], None))
         line_list.append(data)
 create_product_template_attribute_line(line_list)
 print("line d'attribut done")
@@ -449,7 +457,7 @@ print("line d'attribut done")
 attribute_val_obj = odoov13.env['product.attribute.value']
 product_attribute_val_ids = attribute_val_obj.search([])
 product_attribute_val_data = attribute_val_obj.read(product_attribute_val_ids, ['old_id'])
-dict_product_attribute_val = {part['old_id']:part['id'] for part in product_attribute_val_data}
+dict_product_attribute_val = {part['old_id']: part['id'] for part in product_attribute_val_data}
 
 attribute_line_obj = odoov13.env['product.template.attribute.line']
 product_attribute_line_ids = attribute_line_obj.search([])

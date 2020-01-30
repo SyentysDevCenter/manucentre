@@ -1,26 +1,38 @@
 import odoorpc
 import psycopg2
+import databaseconfig as cfg
 
-USER = 'odoo13'
-PASSWORD = 'odoo'
-USER_source = 'openpg'
-PASSWORD_source = 'openpgpwd'
-HOST = "127.0.0.1"
-Port_source = "5433"
-Port_dest = "5432"
-DB_souce = 'manucentre9'
-DB_dest = 'manucentre4'
+# SOURCE
+SOURCE_HOST =cfg.source_connect['SOURCE_HOST']
+SOURCE_USER =cfg.source_connect['SOURCE_USER']
+SOURCE_PASSWORD = cfg.source_connect['SOURCE_PASSWORD']
+SOURCE_PORT = cfg.source_connect['SOURCE_PORT']
+SOURCE_DB = cfg.source_connect['SOURCE_DB']
+SOURCE_ODOO_USER = cfg.source_connect['SOURCE_ODOO_USER']
+SOURCE_ODOO_PASSWORD = cfg.source_connect['SOURCE_ODOO_PASSWORD']
+ODOO_SOURCE_PORT = cfg.source_connect['ODOO_SOURCE_PORT']
 
-Companies_map = {1:1}
+# DEST
+DEST_ODOO_USER =cfg.dest_connect['DEST_ODOO_USER']
+DEST_ODOO_PASSWORD = cfg.dest_connect['DEST_ODOO_PASSWORD']
+DEST_USER = cfg.dest_connect['DEST_USER']
+DEST_PASSWORD = cfg.dest_connect['DEST_PASSWORD']
+DEST_DB = cfg.dest_connect['DEST_DB']
+DEST_HOST = cfg.dest_connect['DEST_HOST']
+DEST_PORT = cfg.dest_connect['DEST_PORT']
+ODOO_DEST_PORT = cfg.dest_connect['ODOO_DEST_PORT']
+
+
+Companies_map = cfg.company_map
 
 
 def get_product_tags():
     try:
-        connection = psycopg2.connect(user = USER_source,
-                                      password = PASSWORD_source,
-                                      host = HOST,
-                                      port = Port_source,
-                                      database = DB_souce)
+        connection = psycopg2.connect(user = SOURCE_USER,
+                                      password = SOURCE_PASSWORD,
+                                      host = SOURCE_HOST,
+                                      port = SOURCE_PORT,
+                                      database = SOURCE_DB)
 
 
         cursor = connection.cursor()
@@ -43,11 +55,11 @@ def get_product_tags():
 
 def get_purchase_price():
     try:
-        connection = psycopg2.connect(user = USER_source,
-                                      password = PASSWORD_source,
-                                      host = HOST,
-                                      port = Port_source,
-                                      database = DB_souce)
+        connection = psycopg2.connect(user = SOURCE_USER,
+                                      password = SOURCE_PASSWORD,
+                                      host = SOURCE_HOST,
+                                      port = SOURCE_PORT,
+                                      database = SOURCE_DB)
 
 
         cursor = connection.cursor()
@@ -70,11 +82,11 @@ def get_purchase_price():
 
 def update_standard_price(price):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
 
@@ -97,11 +109,11 @@ def update_standard_price(price):
 
 def create_product_tags(tags):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
 
@@ -123,11 +135,11 @@ def create_product_tags(tags):
 
 def get_prices():
     try:
-        connection = psycopg2.connect(user = USER_source,
-                                      password = PASSWORD_source,
-                                      host = HOST,
-                                      port = Port_source,
-                                      database = DB_souce)
+        connection = psycopg2.connect(user = SOURCE_USER,
+                                      password = SOURCE_PASSWORD,
+                                      host = SOURCE_HOST,
+                                      port = SOURCE_PORT,
+                                      database = SOURCE_DB)
 
         cursor = connection.cursor()
         query = """
@@ -149,11 +161,11 @@ def get_prices():
 
 def create_prices(prices):
     try:
-        connection = psycopg2.connect(user = USER,
-                                      password = PASSWORD,
-                                      host = HOST,
-                                      port = Port_dest,
-                                      database = DB_dest)
+        connection = psycopg2.connect(user = DEST_USER,
+                                      password = DEST_PASSWORD,
+                                      host = DEST_HOST,
+                                      port = DEST_PORT,
+                                      database = DEST_DB)
 
         cursor = connection.cursor()
         for p in prices:
@@ -178,12 +190,12 @@ def create_prices(prices):
                 connection.close()
 
 # Login to source server
-odoo = odoorpc.ODOO('localhost', port=8091)
-odoo.login('manucentre9', 'admin', 'a')
+odoo = odoorpc.ODOO(SOURCE_HOST, port=ODOO_SOURCE_PORT)
+odoo.login(SOURCE_DB,SOURCE_ODOO_USER, SOURCE_ODOO_PASSWORD)
 
 # Login to destination server
-odoov13 = odoorpc.ODOO('localhost', port=8069)
-odoov13.login('manucentre4', 'admin', 'a')
+odoov13 = odoorpc.ODOO(DEST_HOST, port=ODOO_DEST_PORT)
+odoov13.login(DEST_DB, DEST_ODOO_USER, DEST_ODOO_PASSWORD)
 
 partner = odoo.env['res.partner']
 
