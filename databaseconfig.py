@@ -58,8 +58,8 @@ property_account_expense_categ_map = {
 }
 
 property_account_income_categ_map = {
-    '1':'425',
-    '11':'12965',
-    '12':'12964',
-    '13':'16653',
+    '1':'631',
+    '11':'13583',
+    '12':'13582',
+    '13':'13581',
 }
