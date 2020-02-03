@@ -428,8 +428,8 @@ def create_product_attribute_rel(vals):
                 connection.close()
 
 # Login to source server
-odoo = odoorpc.ODOO(SOURCE_HOST, port=ODOO_SOURCE_PORT)
-odoo.login(SOURCE_DB,SOURCE_ODOO_USER, SOURCE_ODOO_PASSWORD)
+#odoo = odoorpc.ODOO(SOURCE_HOST, port=ODOO_SOURCE_PORT)
+#odoo.login(SOURCE_DB,SOURCE_ODOO_USER, SOURCE_ODOO_PASSWORD)
 
 # Login to destination server
 odoov13 = odoorpc.ODOO(DEST_HOST, port=ODOO_DEST_PORT)

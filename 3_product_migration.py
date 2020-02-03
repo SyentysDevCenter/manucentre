@@ -33,7 +33,7 @@ def get_product_product():
 
         cursor = connection.cursor()
         query = """
-                select id,product_tmpl_id,default_code,active
+                select id,product_tmpl_id,default_code,active,barcode 
                 from product_product;
                 """
         cursor.execute(query)
@@ -180,9 +180,9 @@ def create_product_products(products):
         cursor = connection.cursor()
         for p in products:
             cursor.execute("INSERT INTO product_product "
-                           "(old_id, product_tmpl_id, default_code, active) "
-                           "VALUES(%s, %s,%s, %s)",
-                           (p[0], p[1], p[2], p[3]))
+                           "(old_id, product_tmpl_id, default_code, active, barcode) "
+                           "VALUES(%s, %s,%s, %s,%s)",
+                           (p[0], p[1], p[2], p[3],p[4]))
         connection.commit()
     except (Exception, psycopg2.Error) as error :
         print ("Error while connecting to PostgreSQL", error)
@@ -193,8 +193,8 @@ def create_product_products(products):
 
 
 # Login to source server
-odoo = odoorpc.ODOO(SOURCE_HOST, port=ODOO_SOURCE_PORT)
-odoo.login(SOURCE_DB,SOURCE_ODOO_USER, SOURCE_ODOO_PASSWORD)
+#odoo = odoorpc.ODOO(SOURCE_HOST, port=ODOO_SOURCE_PORT)
+#odoo.login(SOURCE_DB,SOURCE_ODOO_USER, SOURCE_ODOO_PASSWORD)
 
 # Login to destination server
 odoov13 = odoorpc.ODOO(DEST_HOST, port=ODOO_DEST_PORT)
@@ -203,11 +203,11 @@ odoov13.login(DEST_DB, DEST_ODOO_USER, DEST_ODOO_PASSWORD)
 
 categ = odoov13.env['product.category']
 categ13_all = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['product', 'product_category_all'], {})
-categ_all = odoo.execute_kw('ir.model.data', 'get_object_reference', ['product', 'product_category_all'], {})
-categ.write([categ13_all[1]],{'old_id': categ_all[1]})
+#categ_all = odoo.execute_kw('ir.model.data', 'get_object_reference', ['product', 'product_category_all'], {})
+categ.write([categ13_all[1]],{'old_id': 1})
 categ13_sale = odoov13.execute_kw('ir.model.data', 'get_object_reference', ['product', 'product_category_1'], {})
-categ_sale = odoo.execute_kw('ir.model.data', 'get_object_reference', ['product', 'product_category_1'], {})
-categ.write([categ13_sale[1]],{'old_id': categ_sale[1]})
+#categ_sale = odoo.execute_kw('ir.model.data', 'get_object_reference', ['product', 'product_category_1'], {})
+categ.write([categ13_sale[1]],{'old_id': 2})
 
 categs = get_product_categs()
 list_categs = []
@@ -286,6 +286,7 @@ for p in product_products:
             dict_product_tmpl.get(p[1],None),
             p[2],
             p[3],
+            p[4],
         )
         list_p_p.append(data)
 create_product_products(list_p_p)

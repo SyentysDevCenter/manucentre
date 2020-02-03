@@ -190,14 +190,14 @@ def create_prices(prices):
                 connection.close()
 
 # Login to source server
-odoo = odoorpc.ODOO(SOURCE_HOST, port=ODOO_SOURCE_PORT)
-odoo.login(SOURCE_DB,SOURCE_ODOO_USER, SOURCE_ODOO_PASSWORD)
+#odoo = odoorpc.ODOO(SOURCE_HOST, port=ODOO_SOURCE_PORT)
+#odoo.login(SOURCE_DB,SOURCE_ODOO_USER, SOURCE_ODOO_PASSWORD)
 
 # Login to destination server
 odoov13 = odoorpc.ODOO(DEST_HOST, port=ODOO_DEST_PORT)
 odoov13.login(DEST_DB, DEST_ODOO_USER, DEST_ODOO_PASSWORD)
 
-partner = odoo.env['res.partner']
+#partner = odoo.env['res.partner']
 
 product_tmpl = odoov13.env['product.template']
 product_tmpl_ids = product_tmpl.search([])
