@@ -14,52 +14,52 @@ dest_connect = {'DEST_ODOO_USER': 'admin',
                 'DEST_ODOO_PASSWORD': 'a',
                 'DEST_USER': 'odoo',
                 'DEST_PASSWORD': 'odoo',
-                'DEST_DB': 'MANUCENTRE_MIGRATION_SCRIPT_PRE_PROD',
+                'DEST_DB': 'MANUCENTRE_MIGRATION_PP_T',
                 'DEST_HOST': "localhost",
                 'DEST_PORT': "5432",
                 'ODOO_DEST_PORT': "8069"}
 
 company_map = {
     '1':'1',
-    '22':'13',
-    '24':'11',
-    '25':'12',
-    '26':'13',
+    '22':'4',
+    '24':'2',
+    '25':'3',
+    '26':'4',
 }
 
 loc_map = {
     '1':'8',
-    '22':'144',
-    '24':'112',
-    '25':'122',
-    '26':'132',
+    '22':'48',
+    '24':'18',
+    '25':'24',
+    '26':'30',
 }
 
 
 property_account_receivable_map = {
     '1':'281',
-    '11':'12524',
-    '12':'12523',
-    '13':'12522',
+    '2':'998',
+    '3':'1715',
+    '4':'2432',
 }
 
 property_account_payable_map = {
     '1':'267',
-    '11':'12482',
-    '12':'12481',
-    '13':'12480',
+    '2':'984',
+    '3':'1701',
+    '4':'2418',
 }
 
 property_account_expense_categ_map = {
     '1':'425',
-    '11':'12965',
-    '12':'12964',
-    '13':'16653',
+    '2':'1142',
+    '3':'1859',
+    '4':'2576',
 }
 
 property_account_income_categ_map = {
     '1':'631',
-    '11':'13583',
-    '12':'13582',
-    '13':'13581',
+    '2':'1348',
+    '3':'2065',
+    '4':'2782',
 }

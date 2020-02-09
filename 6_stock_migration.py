@@ -64,7 +64,6 @@ def create_stock_quant(lots):
 
         cursor = connection.cursor()
         for lot in lots:
-            print(lot)
             cursor.execute("INSERT INTO stock_quant "\
              "(product_id,company_id,location_id,quantity,reserved_quantity)"\
              " VALUES(%s,%s,%s,%s,%s)",

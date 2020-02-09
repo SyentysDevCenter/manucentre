@@ -228,7 +228,7 @@ for p in prices:
 
         )
         list_p_p.append(data)
-create_prices(list_p_p)
+#create_prices(list_p_p)
 
 print('prices done')
 
@@ -244,7 +244,7 @@ for p in product_tags:
 
         tags_produ_list.append(data)
 
-create_product_tags(tags_produ_list)
+#create_product_tags(tags_produ_list)
 
 print("tags done")
 
@@ -255,9 +255,10 @@ standard_price_field = odoov13.execute_kw('ir.model.data', 'get_object_reference
                                           ['product', 'field_product_product__standard_price'], {})
 prod = []
 for p in prices:
-    company = Companies_map.get(p[2], False)
+    company = Companies_map.get(str(p[2]), False)
     if company != False:
         if p[1] not in prod:
+            prod.append(p[1])
             product_id = dict_product_prod.get(p[1], False)
             if product_id:
                 product_price.append(('standard_price', 'product.product,' + str(product_id), company,

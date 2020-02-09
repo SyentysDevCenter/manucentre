@@ -3,7 +3,7 @@
 {
     "name": "Odoo migration",
     "version": "1.1",
-    "depends": ['base','product',"stock", "uom", 'product_extend', 'account'],
+    "depends": ['base','product',"stock", "uom", 'product_extend', 'account','point_of_sale'],
     "author": "ANDEMA",
     'website': 'http://www.andemaconulting.com',
     "category": "",

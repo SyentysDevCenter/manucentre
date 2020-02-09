@@ -97,4 +97,9 @@ class ProductTemplateAttributeLine(models.Model):
 
     old_id = fields.Integer(string='Old id', readonly=False)
 
+class PosCategory(models.Model):
+    _inherit = 'pos.category'
+
+    old_id = fields.Integer(string='Old id', readonly=False)
+
 

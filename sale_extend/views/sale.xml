@@ -10,6 +10,7 @@
                     <field name="margin_percent" groups="product_extend.group_show_product_cost" optional="hide"/>
                     <field name="sale_purchase_price"/>
                     <field name="sales_margin_percent" optional="hide"/>
+                    <field name="ref_variante" optional="hide"/>
                 </xpath>
             </field>
         </record>
