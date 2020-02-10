@@ -14,7 +14,7 @@ dest_connect = {'DEST_ODOO_USER': 'admin',
                 'DEST_ODOO_PASSWORD': 'a',
                 'DEST_USER': 'odoo',
                 'DEST_PASSWORD': 'odoo',
-                'DEST_DB': 'MANUCENTRE_MIGRATION_PP_T',
+                'DEST_DB': 'MANUCENTRE_MIGRATION_PP_V2_T',
                 'DEST_HOST': "localhost",
                 'DEST_PORT': "5432",
                 'ODOO_DEST_PORT': "8069"}
