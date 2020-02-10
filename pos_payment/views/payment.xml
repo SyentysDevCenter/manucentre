@@ -1,6 +1,17 @@
 <odoo>
     <data>
 
+        <record model="ir.ui.view" id="inherit_pos_payment_method_form">
+            <field name="name">pos.payment.method.inherit</field>
+            <field name="model">pos.payment.method</field>
+            <field name="inherit_id" ref="point_of_sale.pos_payment_method_view_form"/>
+            <field name="arch" type="xml">
+                <field name="company_id" position="before">
+                    <field name="pay_method_id"/>
+                </field>
+            </field>
+        </record>
+
         <record model="ir.ui.view" id="inherit_account_payment_form">
             <field name="name">account.payment.inherit</field>
             <field name="model">account.payment</field>
@@ -36,6 +47,43 @@
                 </notebook>
             </field>
         </record>
+
+        <record model="ir.ui.view" id="account_payment_method_form">
+            <field name="name">account.payment.method.form</field>
+            <field name="model">account.payment.method</field>
+            <field name="arch" type="xml">
+                <form string="Méthodes de paiements">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="payment_type"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="account_payment_method_tree">
+            <field name="name">account.payment.method.tree</field>
+            <field name="model">account.payment.method</field>
+            <field name="arch" type="xml">
+                <tree string="Méthodes de paiements">
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="payment_type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_account_payment_method" model="ir.actions.act_window">
+            <field name="name">Méthodes de paiements</field>
+            <field name="res_model">account.payment.method</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_account_payment_method" name="Méthodes de paiements" parent="account.menu_finance_configuration" sequence="6" action="action_account_payment_method" groups="account.group_account_manager"/>
 
 
 

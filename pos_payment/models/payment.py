@@ -10,6 +10,11 @@ class POSPayment(models.Model):
     type = fields.Selection(selection=[('pos', 'POS'), ('account', 'Paiement BO')], string='Type')
 
 
+class PosPaymentMethod(models.Model):
+    _inherit = 'pos.payment.method'
+
+    pay_method_id = fields.Many2one('account.payment.method',string='Méthode de payment',domain="[('payment_type','=','inbound')]")
+
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
@@ -20,7 +25,14 @@ class AccountPayment(models.Model):
         else:
             return False
 
-    pos_payment_id = fields.Many2one('pos.payment.method',string='Pos payment')
+    @api.onchange('payment_method_id')
+    def onchange_payment_method_id(self):
+        if self.payment_method_id:
+            pos_payment_id = self.env['pos.payment.method'].search([('pay_method_id','=',self.payment_method_id.id),('company_id','=',self.company_id.id)],limit=1)
+            if pos_payment_id:
+                self.pos_payment_id = pos_payment_id
+
+    pos_payment_id = fields.Many2one('pos.payment.method',string='Pos payment',domain="[('company_id','=',company_id)]")
     pos_session_id = fields.Many2one('pos.session',string='POS session',default=_get_pos_session)
 
 class PosSession(models.Model):

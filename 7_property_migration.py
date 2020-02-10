@@ -216,7 +216,7 @@ for cat_prop in  property_account_income_categ_id_ids:
             categ_res_id = 'product.category,' + str(old_categ_ids.get(cat_prop[2], False))
             account_income_categ_data = (
             'property_account_income_categ_id', categ_res_id,
-            property_account_expense_categ_field[1], 'account.account,' + str(old_account_ids.get(cat_prop[1],False)), "many2one",
+            property_account_income_categ_field[1], 'account.account,' + str(old_account_ids.get(cat_prop[1],False)), "many2one",
             int(company_map[str(cat_prop[0])]))
             property_account_income_data.append(account_income_categ_data)
 create_properties(property_account_income_data)
