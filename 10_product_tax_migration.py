@@ -172,7 +172,7 @@ for tax in taxes_ids:
                     dict_product_prod.get(tax[2], False),tax_id
                 )
                 taxes_data.add(tax_data)
-#create_taxes(taxes_data)
+create_taxes(taxes_data)
 
 supplier_taxes_ids = get_supplier_taxes()
 supplier_taxes_data = set()
@@ -186,6 +186,3 @@ for tax in supplier_taxes_ids:
                 )
                 supplier_taxes_data.add(tax_data)
 create_supplier_taxes(supplier_taxes_data)
-
-
-

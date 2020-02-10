@@ -1,0 +1,43 @@
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="inherit_account_payment_form">
+            <field name="name">account.payment.inherit</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+                <field name="payment_method_id" position="after">
+                    <field name="pos_payment_id"/>
+                    <field name="pos_session_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="inherit_pos_session_form">
+            <field name="name">pos.session.inherit</field>
+            <field name="model">pos.session</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_session_form"/>
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button name="action_show_account_payments_list" type="object" class="oe_stat_button" icon="fa-dollar">
+                            <field name="total_account_payments_amount" widget="statinfo" string="Paiement BO"/>
+                    </button>
+                </div>
+                <notebook position="inside">
+                    <page string="Paiements par type">
+                        <field name="pos_payment_by_method_ids">
+                            <tree>
+                                <field name="pos_payment_id"/>
+                                <field name="amount"/>
+                                <field name="type"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+
+
+    </data>
+</odoo>
