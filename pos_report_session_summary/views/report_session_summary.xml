@@ -5,55 +5,58 @@
         <t t-foreach="docs" t-as="o">
             <t t-call="web.external_layout">
                 <div class="page">
-                    <h2>Session Summary: <span t-field="o.name"/></h2>
+                    <h2>Résumé de la session :<span t-field="o.name"/></h2>
 
                     <div class="row mt32 mb32">
                         <div class="col-auto mw-100 mb-3">
-                            <strong>Responsible</strong>:<br/>
+                            <strong>Responsable</strong>:<br/>
                             <span t-field="o.user_id"/>
                         </div>
                         <div class="col-auto mw-100 mb-3">
-                            <strong>Point of Sale</strong>:<br/>
+                            <strong>Point de vente</strong>:<br/>
                             <span t-field="o.config_id"/>
                         </div>
                         <div class="col-auto mw-100 mb-3">
-                            <strong>Opening Date</strong>:<br/>
+                            <strong>Date d'ouverture</strong>:<br/>
                             <span t-field="o.start_at"/>
                         </div>
                         <div class="col-auto mw-100 mb-3">
-                            <strong>Closing Date</strong>:<br/>
+                            <strong>Date de clôture</strong>:<br/>
                             <span t-field="o.stop_at"/>
                         </div>
                     </div>
 
-                    <h4>Statement Summary</h4>
+                    <h4>Résumé du relevé</h4>
 
                     <table class="table table-sm o_main_table">
                         <thead>
                             <tr>
                                 <th>
-                                    <strong>Reference</strong>
+                                    <strong>Référence</strong>
                                 </th>
                                 <th>
                                     <strong>Journal</strong>
                                 </th>
                                 <th class="text-right">
-                                    <strong>Starting Balance</strong>
+                                    <strong>Solde de départ</strong>
                                 </th>
                                 <th class="text-right">
-                                    <strong>Total Transactions</strong>
+                                    <strong>Total des transactions</strong>
                                 </th>
                                 <th class="text-right">
-                                    <strong>Ending Balance</strong>
+                                    <strong>Nb total des transactions</strong>
                                 </th>
                                 <th class="text-right">
-                                    <strong>Difference</strong>
+                                    <strong>Solde final</strong>
+                                </th>
+                                <th class="text-right">
+                                    <strong>Différence</strong>
                                 </th>
                                 <th class="text-right" groups="base.group_multi_currency">
-                                    <strong>Currency</strong>
+                                    <strong>Devise</strong>
                                 </th>
                                 <th class="text-right">
-                                    <strong>Status</strong>
+                                    <strong>Statut</strong>
                                 </th>
                             </tr>
                         </thead>
@@ -67,6 +70,10 @@
                                 </td>
                                 <td class="text-right">
                                     <span t-field="statement.total_entry_encoding"
+                                        t-field-options='{"widget": "monetary", "display_currency": "statement.currency_id"}'/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="statement.company_id"
                                         t-field-options='{"widget": "monetary", "display_currency": "statement.currency_id"}'/>
                                 </td>
                                 <td class="text-right">
@@ -86,26 +93,26 @@
                     </table>
 
                     <t t-foreach="o.statement_ids" t-as="statement">
-                        <h4 t-if="statement.line_ids">Statement Details: <span t-esc="statement.name"/></h4>
+                        <h4 t-if="statement.line_ids">Détails du Relevé : <span t-esc="statement.name"/></h4>
 
                         <table class="table table-sm o_main_table" t-if="statement.line_ids">
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>Description</th>
-                                    <th>Reference</th>
-                                    <th>Partner</th>
-                                    <th>Account</th>
-                                    <th class="text-right">Amount</th>
+                                    <th>Transaction</th>
+                                    <th>Session</th>
+                                    <th>Client</th>
+                                    <th>Vendeur</th>
+                                    <th class="text-right">Montant</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr t-foreach="statement.line_ids" t-as="line">
                                     <td><span t-field="line.date"/></td>
+                                    <td><span t-field="line.move_name"/></td>
                                     <td><span t-field="line.name"/></td>
-                                    <td><span t-field="line.ref"/></td>
                                     <td><span t-field="line.partner_id"/></td>
-                                    <td><span t-field="line.account_id"/></td>
+                                    <td><span t-field="line.statement_id.user_id"/></td>
                                     <td class="text-right">
                                         <span t-field="line.amount"
                                             t-field-options='{"widget": "monetary", "display_currency": "statement.currency_id"}'/>
