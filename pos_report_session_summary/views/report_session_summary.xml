@@ -3,7 +3,7 @@
 <template id="report_session_summary">
     <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
-            <t t-call="web.external_layout">
+            <t t-call="web.basic_layout">
                 <div class="page">
                     <h2>Résumé de la session :<span t-field="o.name"/></h2>
 
@@ -58,16 +58,20 @@
                         <t t-set="o_amount_tax_total" t-value="sum(o.amount_tax for o in orders)"/>
                         <t t-set="bo_amount_total" t-value="sum(o.amount for o in bo)"/>
 
-                        <!-- TBD -->
+                        <!-- TBD add bo -->
+
                         <t t-set="bo_amount_tax_total" t-value="0"/>
-                        <t t-set="tva_5" t-value="0"/>
-                        <t t-set="tva_20" t-value="0"/>
 
                         <strong>Chiffre d'affaire ttc</strong>: <t t-esc="o_amount_total + bo_amount_total"/><br/>
                         <strong>Chiffre d'affaire HT</strong>: <t t-esc="o_amount_total + bo_amount_total - o_amount_tax_total - bo_amount_tax_total"/><br/>
                         <strong>TVA</strong>: <t t-esc="o_amount_tax_total + bo_amount_tax_total"/><br/>
-                        <strong>TVA 5%</strong>: <t t-esc="tva_5"/><br/>
-                        <strong>TVA 20%</strong>: <t t-esc="tva_20"/><br/>
+                        <t t-set="move_lines" t-value="o._get_related_account_moves().mapped('line_ids')"/>
+                        <t t-foreach="move_lines" t-as="line">
+                            <tr  t-if="line.tax_line_id">
+                                <td><strong t-field="line.name"/>: </td>
+                                <td><span t-field="line.credit"/></td><br/>
+                            </tr>
+                        </t>
                     </div>
 
                     <!-- pos orders group by payment method -->
