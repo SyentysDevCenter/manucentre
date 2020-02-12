@@ -73,8 +73,7 @@
                                         t-field-options='{"widget": "monetary", "display_currency": "statement.currency_id"}'/>
                                 </td>
                                 <td class="text-right">
-                                    <span t-field="statement.company_id"
-                                        t-field-options='{"widget": "monetary", "display_currency": "statement.currency_id"}'/>
+                                    <t t-esc="sum(s.id for s in statement) " />
                                 </td>
                                 <td class="text-right">
                                     <span t-field="statement.balance_end_real"
