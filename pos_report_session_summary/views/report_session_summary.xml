@@ -32,69 +32,55 @@
                         <thead>
                             <tr>
                                 <th>
-                                    <strong>Référence</strong>
+                                    <strong>Pos Pyament</strong>
                                 </th>
                                 <th>
-                                    <strong>Journal</strong>
+                                    <strong>Montant</strong>
                                 </th>
                                 <th class="text-right">
-                                    <strong>Solde de départ</strong>
-                                </th>
-                                <th class="text-right">
-                                    <strong>Total des transactions</strong>
-                                </th>
-                                <th class="text-right">
-                                    <strong>Nb total des transactions</strong>
-                                </th>
-                                <th class="text-right">
-                                    <strong>Solde final</strong>
-                                </th>
-                                <th class="text-right">
-                                    <strong>Différence</strong>
-                                </th>
-                                <th class="text-right" groups="base.group_multi_currency">
-                                    <strong>Devise</strong>
-                                </th>
-                                <th class="text-right">
-                                    <strong>Statut</strong>
+                                    <strong>Type</strong>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr t-foreach="o.statement_ids" t-as="statement">
-                                <td><span t-field="statement.name"/></td>
-                                <td><span t-field="statement.journal_id"/></td>
-                                <td class="text-right">
-                                    <span t-field="statement.balance_start"
-                                        t-field-options='{"widget": "monetary", "display_currency": "statement.currency_id"}'/>
-                                </td>
-                                <td class="text-right">
-                                    <span t-field="statement.total_entry_encoding"
-                                        t-field-options='{"widget": "monetary", "display_currency": "statement.currency_id"}'/>
-                                </td>
-                                <td class="text-right">
-                                    <t t-esc="sum(s.id for s in statement) " />
-                                </td>
-                                <td class="text-right">
-                                    <span t-field="statement.balance_end_real"
-                                        t-field-options='{"widget": "monetary", "display_currency": "statement.currency_id"}'/>
-                                </td>
-                                <td class="text-right">
-                                    <span t-field="statement.difference"
-                                        t-field-options='{"widget": "monetary", "display_currency": "statement.currency_id"}'/>
-                                </td>
-                                <td class="text-right" groups="base.group_multi_currency">
-                                    <span t-field="statement.currency_id"/>
-                                </td>
-                                <td class="text-right"><span t-field="statement.state"/></td>
+                            <tr t-foreach="o.pos_payment_by_method_ids" t-as="payment">
+                                <td><span t-field="payment.pos_payment_id"/></td>
+                                <td><span t-field="payment.amount"/></td>
+                                <td class="text-right"><span t-field="payment.type"/></td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <t t-foreach="o.statement_ids" t-as="statement">
-                        <h4 t-if="statement.line_ids">Détails du Relevé : <span t-esc="statement.name"/></h4>
+                    <div>
+                        <t t-set="orders" t-value="o.order_ids"/>
+                        <t t-set="bo" t-value="o.account_payment_ids"/>
+                        <t t-set="o_amount_total" t-value="sum(o.amount_total for o in orders)"/>
+                        <t t-set="o_amount_tax_total" t-value="sum(o.amount_tax for o in orders)"/>
+                        <t t-set="bo_amount_total" t-value="sum(o.amount for o in bo)"/>
 
-                        <table class="table table-sm o_main_table" t-if="statement.line_ids">
+                        <!-- TBD -->
+                        <t t-set="bo_amount_tax_total" t-value="0"/>
+                        <t t-set="tva_5" t-value="0"/>
+                        <t t-set="tva_20" t-value="0"/>
+
+                        <strong>Chiffre d'affaire ttc</strong>: <t t-esc="o_amount_total + bo_amount_total"/><br/>
+                        <strong>Chiffre d'affaire HT</strong>: <t t-esc="o_amount_total + bo_amount_total - o_amount_tax_total - bo_amount_tax_total"/><br/>
+                        <strong>TVA</strong>: <t t-esc="o_amount_tax_total + bo_amount_tax_total"/><br/>
+                        <strong>TVA 5%</strong>: <t t-esc="tva_5"/><br/>
+                        <strong>TVA 20%</strong>: <t t-esc="tva_20"/><br/>
+                    </div>
+
+                    <!-- pos orders group by payment method -->
+                    <t t-set="payment_method" t-value="[]"/>
+                    <t t-foreach="o.order_ids.mapped('payment_ids')" t-as="p">
+                        <t t-set="payment_method" t-value="payment_method+[p.payment_method_id.name]"/>
+                    </t>
+
+                    <t t-foreach="set(payment_method)" t-as="payment_method_group">
+                        <p style="page-break-after:always;"/>
+                        <h4>Détails du Relevé : <span t-esc="payment_method_group"/></h4>
+
+                        <table class="table table-sm o_main_table">
                             <thead>
                                 <tr>
                                     <th>Date</th>
@@ -106,19 +92,47 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr t-foreach="statement.line_ids" t-as="line">
-                                    <td><span t-field="line.date"/></td>
-                                    <td><span t-field="line.move_name"/></td>
-                                    <td><span t-field="line.name"/></td>
-                                    <td><span t-field="line.partner_id"/></td>
-                                    <td><span t-field="line.statement_id.user_id"/></td>
-                                    <td class="text-right">
-                                        <span t-field="line.amount"
-                                            t-field-options='{"widget": "monetary", "display_currency": "statement.currency_id"}'/>
-                                    </td>
-                                </tr>
+                                <t t-foreach="o.order_ids.mapped('payment_ids')" t-as="p">
+                                    <tr  t-if="payment_method_group==p.payment_method_id.name">
+                                        <td><span t-field="p.pos_order_id.date_order"/></td>
+                                        <td><span t-field="p.transaction_id"/></td>
+                                        <td><span t-field="p.session_id"/></td>
+                                        <td><span t-field="p.pos_order_id.partner_id"/></td>
+                                        <td><span t-field="p.pos_order_id.user_id"/></td>
+                                        <td class="text-right"><span t-field="p.amount"/></td>
+                                    </tr>
+                                </t>
                             </tbody>
                         </table>
+                    </t>
+
+                    <!-- bo -->
+                    <t t-set="bo" t-value="o.account_payment_ids">
+                        <p style="page-break-after:always;"/>
+                        <h4 t-if="bo">Détails du Relevé : <span t-esc="bo"/></h4>
+
+                            <table class="table table-sm o_main_table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Transaction</th>
+                                        <th>Session</th>
+                                        <th>Client</th>
+                                        <th>Vendeur</th>
+                                        <th class="text-right">Montant</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr  t-foreach="bo" t-as="b">
+                                        <td><span t-field="b.invoice_date"/></td>
+                                        <td><span t-field="b.journal_id"/></td>
+                                        <td><span t-field="o.journal_id"/></td>
+                                        <td><span t-field="b.partner_id.name"/></td>
+                                        <td><span t-field="b.invoice_user_id"/></td>
+                                        <td class="text-right"><span t-field="b.amount_total"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                     </t>
                 </div>
             </t>

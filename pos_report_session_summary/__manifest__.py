@@ -2,8 +2,6 @@
 {
     'name': 'POS report Session Summary',
 
-    'last update': '02/12/2020',
-
     'summary': 'Session Summary report on the POS session',
 
     'author': 'SYENTYS',
