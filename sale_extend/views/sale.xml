@@ -6,6 +6,9 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="employee_id"/>
+                </field>
                 <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="after">
                     <field name="margin_percent" groups="product_extend.group_show_product_cost" optional="hide"/>
                     <field name="sale_purchase_price"/>
@@ -47,6 +50,54 @@
                 </field>
             </field>
         </record>
+
+
+        <record id="view_account_payment_calendar" model="ir.ui.view">
+            <field name="name">account.payment.calendar</field>
+            <field name="model">account.payment</field>
+            <field name="arch" type="xml">
+                <calendar string="Paiements" date_start="payment_date" color="partner_id" hide_time="true" event_limit="5">
+                    <field name="partner_id" avatar_field="image_128"/>
+                    <field name="amount" widget="monetary"/>
+                    <field name="payment_method_id"/>
+                </calendar>
+            </field>
+        </record>
+
+
+        <record id="account.action_account_payments" model="ir.actions.act_window">
+            <field name="name">Payments</field>
+            <field name="res_model">account.payment</field>
+            <field name="view_mode">tree,calendar,kanban,form,graph</field>
+            <field name="context">{
+                'default_payment_type': 'inbound',
+                'default_partner_type': 'customer',
+                'search_default_inbound_filter': 1,
+                'res_partner_search_mode': 'customer',
+            }</field>
+            <field name="view_id" ref="account.view_account_payment_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                  Register a payment
+                </p><p>
+                  Payments are used to register liquidity movements. You can process those payments by your own means or by using installed facilities.
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+            id="menu_sale_action_move_out_invoice_type"
+            name="Facture"
+            action="account.action_move_out_invoice_type"
+            parent="sale.sale_order_menu"
+            sequence="10"/>
+
+        <menuitem
+            id="menu_sale_action_account_payments"
+            name="Paiements"
+            action="account.action_account_payments"
+            parent="sale.sale_order_menu"
+            sequence="11"/>
 
     </data>
 </odoo>

@@ -4,7 +4,7 @@
     "name": "Sale extend",
     "version": "1.1",
 
-    "depends": ['base', 'product', 'sale','product_extend','sale_margin'],
+    "depends": ['base', 'product', 'sale','product_extend','sale_margin','account'],
 
     "author": "ANDEMA",
     'website': 'http://www.andemaconulting.com',

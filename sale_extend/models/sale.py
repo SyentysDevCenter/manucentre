@@ -2,6 +2,11 @@
 
 from odoo import api, fields, models
 
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    employee_id = fields.Many2one('hr.employee', string='Employé',required=True)
+
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
