@@ -9,8 +9,8 @@
     'depends': ['point_of_sale'],
 
     'data': [
-        'views/session_summary_report.xml',
-        'views/report_session_summary.xml',
+        'report/point_of_sale_report.xml',
+        'report/report_session_summary.xml',
     ],
 
     'installable': True,

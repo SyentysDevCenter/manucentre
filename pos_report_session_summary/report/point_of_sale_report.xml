@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<odoo>
+
+     <record id="paperformat_pos_sessionsummary" model="report.paperformat">
+          <field name="name">pos session summary landscape</field>
+          <field name="default" eval="True"/>
+          <field name="format">A4</field>
+          <field name="page_height">0</field>
+          <field name="page_width">0</field>
+          <field name="orientation">Landscape</field>
+          <field name="margin_top">5</field>
+          <field name="margin_bottom">5</field>
+          <field name="margin_left">5</field>
+          <field name="margin_right">5</field>
+          <field name="header_line" eval="False"/>
+          <field name="header_spacing">0</field>
+          <field name="dpi">80</field>
+    </record>
+
+     <report
+         id="action_pos_report_sessionsummary"
+         model="pos.session"
+         name="pos_report_session_summary.pos_report_sessionsummary"
+         file="pos_report_session_summary.pos_report_sessionsummary"
+         report_type="qweb-pdf"
+         string="POS Session Summary"
+         paperformat="pos_report_session_summary.paperformat_pos_sessionsummary"
+     />
+</odoo>
