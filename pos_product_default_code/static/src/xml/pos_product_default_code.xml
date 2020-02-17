@@ -2,7 +2,7 @@
 
 <templates id="template" inherit_id="point_of_sale.template">
 
-  <t t-extend="PaymentScreen-Product">
+  <t t-extend="Product">
     <t t-jquery=".product-name" t-operation="prepend">
       <t t-if="product.default_code">
         [<t t-esc='product.default_code' />]
